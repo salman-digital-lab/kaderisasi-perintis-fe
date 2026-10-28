@@ -39,15 +39,16 @@ export function StatusBadge({
   variant?: "light" | "filled" | "outline" | "dot";
 }) {
   return (
-    <Badge color={tone} variant={variant} radius="sm" tt="none" fw={600}>
+    <span className={classes.chip} data-tone={tone} data-variant={variant}>
+      {variant === "light" && <span className={classes.chipDot} />}
       {label}
-    </Badge>
+    </span>
   );
 }
 
 export function NewBadge() {
   return (
-    <Badge color="red" variant="filled" size="sm" radius="sm">
+    <Badge color="red" variant="filled" size="sm">
       Baru
     </Badge>
   );

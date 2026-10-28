@@ -197,7 +197,7 @@ function ProfileView({ data }: { data: FullProfile }) {
           </Stack>
         ) : (
           <Alert
-            color="orange"
+            color="yellow"
             variant="light"
             icon={<IconInfoCircle size={18} />}
           >

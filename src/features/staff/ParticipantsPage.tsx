@@ -41,7 +41,7 @@ export function ParticipantsPage() {
         <ActionIcon
           component={Link}
           to="/kelola/impor"
-          variant="subtle"
+          variant="white"
           aria-label="Impor peserta"
         >
           <IconFileImport size={22} />

@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router";
 import { AuthProvider } from "@/auth/AuthProvider";
 import { AppRoutes } from "@/routes";
-import { theme } from "@/theme/theme";
+import { cssVariablesResolver, theme } from "@/theme/theme";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,7 +16,11 @@ const queryClient = new QueryClient({
 
 export function App() {
   return (
-    <MantineProvider theme={theme} defaultColorScheme="light">
+    <MantineProvider
+      theme={theme}
+      cssVariablesResolver={cssVariablesResolver}
+      forceColorScheme="light"
+    >
       <Notifications position="top-center" limit={3} />
       <QueryClientProvider client={queryClient}>
         <ModalsProvider>

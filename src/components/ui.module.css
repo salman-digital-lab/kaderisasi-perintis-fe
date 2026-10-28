@@ -21,14 +21,14 @@
 .rowButton {
   display: block;
   width: 100%;
-  padding: 0.75rem var(--mantine-spacing-md);
+  padding: 0.875rem var(--mantine-spacing-md);
   border-radius: var(--mantine-radius-md);
   border: 1px solid var(--surface-border);
-  background: var(--mantine-color-body);
+  background: #ffffff;
   min-height: 3.5rem;
 }
 .rowButton:active {
-  background: var(--surface-subtle);
+  background: #f6f9fc;
 }
 @media (hover: hover) and (pointer: fine) {
   .rowButton:hover {
@@ -69,4 +69,66 @@
 .pulseFill {
   height: 100%;
   border-radius: 999px;
+}
+
+/* Status chips: soft fill + dot (light), solid (filled), or ring (outline). */
+.chip {
+  --chip-bg: #eef2f8;
+  --chip-fg: #4a5b78;
+  --chip-dot: #93a6c2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  color: var(--chip-fg);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.chip[data-tone="green"] {
+  --chip-bg: #e3f4ea;
+  --chip-fg: #17663a;
+  --chip-dot: #2e9e57;
+}
+.chip[data-tone="orange"] {
+  --chip-bg: #fff4d6;
+  --chip-fg: #7a5200;
+  --chip-dot: #f5b731;
+}
+.chip[data-tone="blue"] {
+  --chip-bg: #eaf4fc;
+  --chip-fg: #0f3e86;
+  --chip-dot: #1f5fb8;
+}
+.chip[data-tone="red"] {
+  --chip-bg: #fde8e4;
+  --chip-fg: #9a2a16;
+  --chip-dot: #d2452b;
+}
+.chip[data-tone="violet"] {
+  --chip-bg: #0f3e86;
+  --chip-fg: #ffffff;
+  --chip-dot: #ffd66b;
+  border-radius: 10px;
+}
+.chipDot {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--chip-dot);
+}
+.chip[data-variant="filled"] {
+  background: var(--chip-dot);
+  color: #ffffff;
+}
+.chip[data-variant="filled"][data-tone="orange"] {
+  color: #0b1f3f;
+}
+.chip[data-variant="outline"] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--chip-dot);
 }

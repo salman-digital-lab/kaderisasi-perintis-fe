@@ -9,11 +9,7 @@ import {
   Timeline,
   Title,
 } from "@mantine/core";
-import {
-  IconCalendarEvent,
-  IconMessageCircle,
-  IconNotebook,
-} from "@tabler/icons-react";
+import { IconCalendarEvent, IconMessageCircle } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { participantApi } from "@/api/endpoints";
@@ -21,6 +17,7 @@ import type { JournalDetail } from "@/api/types";
 import { useMe } from "@/auth/AuthProvider";
 import { Screen } from "@/components/layout/Screen";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
+import { DisplayTitle, Eyebrow, InfoPill, Quoted } from "@/components/brand";
 import { EmptyState, Loadable, NewBadge, StatusBadge } from "@/components/ui";
 import { JOURNAL_STATUS } from "@/content/labels";
 import { estimatedMinutes } from "@/content/lapbulForm";
@@ -48,34 +45,31 @@ function JournalCard({ detail }: { detail: JournalDetail }) {
   else if (j)
     cta = { to: `/lapbul/${detail.month}`, label: "Lihat Catatan Perjalanan" };
 
+  const showDue =
+    detail.canEdit &&
+    status !== "revision_requested" &&
+    detail.window === "open";
   return (
-    <Paper
-      p="md"
-      style={{
-        borderColor: detail.canEdit ? "var(--mantine-color-blue-4)" : undefined,
-      }}
-    >
-      <Group justify="space-between" wrap="nowrap" align="flex-start">
-        <Group wrap="nowrap" gap="sm" align="flex-start">
-          <ThemeIcon size={40} radius="md" variant="light">
-            <IconNotebook size={22} />
-          </ThemeIcon>
-          <div>
-            <Text size="xs" c="dimmed" fw={600}>
-              Catatan Perjalanan
-            </Text>
-            <Title order={3}>{label}</Title>
-          </div>
-        </Group>
+    <Paper p="lg" radius="lg" withBorder={false} className="raised">
+      <Group justify="space-between" wrap="nowrap" align="center">
+        <Eyebrow>Catatan Perjalanan</Eyebrow>
         <StatusBadge {...JOURNAL_STATUS[status]} />
       </Group>
-      <Text size="sm" mt="sm">
+      <Title order={2} mt={6} mb="sm">
+        {label}
+      </Title>
+      {showDue && (
+        <InfoPill
+          icon={<IconCalendarEvent size={17} />}
+          label={`Tenggat pengisian · ${relativeDays(due.menteeDue)}`}
+          value={fmtDate(due.menteeDue, "dddd, D MMMM YYYY")}
+        />
+      )}
+      <Text size="sm" mt="sm" c={showDue ? "dimmed" : undefined}>
         {detail.window === "upcoming" &&
           `Dibuka ${fmtDate(due.opensAt, "D MMMM")}.`}
-        {detail.canEdit &&
-          status !== "revision_requested" &&
-          detail.window === "open" &&
-          `Tenggat ${fmtDate(due.menteeDue, "dddd, D MMMM")} pukul 23.59 (${relativeDays(due.menteeDue)}). Perkiraan ± ${estimatedMinutes(detail.category)} menit.`}
+        {showDue &&
+          `Paling lambat pukul 23.59 WIB. Perkiraan ± ${estimatedMinutes(detail.category)} menit.`}
         {detail.canEdit &&
           status !== "revision_requested" &&
           detail.window === "late" &&
@@ -124,47 +118,22 @@ export function MenteeHomePage() {
 
   return (
     <Screen
-      title="Beranda"
+      title="Beasiswa Perintis"
       subtitle={fmtDate(now(), "dddd, D MMMM YYYY")}
       actions={<RoleSwitcher />}
-    >
-      <Stack gap="md">
-        <div>
-          <Text size="sm" c="dimmed">
-            Assalamu'alaikum,
-          </Text>
-          <Title order={1}>{firstName}</Title>
-          <Text size="sm" c="dimmed" mt={4}>
+      hero={
+        <Stack gap={4}>
+          <Text size="sm">Assalamu'alaikum, {firstName}</Text>
+          <DisplayTitle>Terus melangkah, catat perjalananmu</DisplayTitle>
+          <Quoted>Pembinaan Perintis</Quoted>
+          <Text size="xs" mt={6} opacity={0.92}>
             {me.mentor ? `Mentor ${me.mentor.name}` : "Belum ada mentor"}
             {me.coordinator ? ` · Koordinator ${me.coordinator.name}` : ""}
           </Text>
-        </div>
-
-        {unread.map((j) => (
-          <Paper
-            key={j.month}
-            p="md"
-            component={Link}
-            to={`/lapbul/${j.month}`}
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            <Group wrap="nowrap" gap="sm">
-              <ThemeIcon size={40} radius="md" color="teal" variant="light">
-                <IconMessageCircle size={22} />
-              </ThemeIcon>
-              <div style={{ flex: 1 }}>
-                <Group gap={6}>
-                  <Text fw={700}>Tanggapan mentor</Text>
-                  <NewBadge />
-                </Group>
-                <Text size="sm" c="dimmed">
-                  Untuk Catatan Perjalanan {monthLabel(j.month)}
-                </Text>
-              </div>
-            </Group>
-          </Paper>
-        ))}
-
+        </Stack>
+      }
+    >
+      <Stack gap="md">
         {!month ? (
           <EmptyState
             title="Program belum dimulai"
@@ -175,6 +144,35 @@ export function MenteeHomePage() {
             {(d) => (
               <>
                 <JournalCard detail={d} />
+                {unread.map((j) => (
+                  <Paper
+                    key={j.month}
+                    p="md"
+                    component={Link}
+                    to={`/lapbul/${j.month}`}
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
+                    <Group wrap="nowrap" gap="sm">
+                      <ThemeIcon
+                        size={40}
+                        radius="md"
+                        color="teal"
+                        variant="light"
+                      >
+                        <IconMessageCircle size={22} />
+                      </ThemeIcon>
+                      <div style={{ flex: 1 }}>
+                        <Group gap={6}>
+                          <Text fw={700}>Tanggapan mentor</Text>
+                          <NewBadge />
+                        </Group>
+                        <Text size="sm" c="dimmed">
+                          Untuk Catatan Perjalanan {monthLabel(j.month)}
+                        </Text>
+                      </div>
+                    </Group>
+                  </Paper>
+                ))}
                 <Paper p="md">
                   <Group gap="sm" wrap="nowrap" mb="sm">
                     <ThemeIcon
@@ -243,7 +241,7 @@ export function MenteeHomePage() {
           </Loadable>
         )}
         {me.participant.status === "pending" && (
-          <Alert color="orange" variant="light">
+          <Alert color="yellow" variant="light">
             Status kepesertaanmu masih menunggu keputusan pengelola.
           </Alert>
         )}

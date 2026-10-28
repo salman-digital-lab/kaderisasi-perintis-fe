@@ -1,19 +1,17 @@
 :root {
   --app-max-width: 30rem;
-  --app-bar-height: 3.5rem;
-  --tab-bar-height: 4rem;
-  --surface-subtle: light-dark(
-    var(--mantine-color-gray-0),
-    var(--mantine-color-dark-7)
-  );
-  --surface-border: light-dark(
-    var(--mantine-color-gray-3),
-    var(--mantine-color-dark-4)
-  );
-  --backdrop: light-dark(
-    var(--mantine-color-gray-1),
-    var(--mantine-color-dark-8)
-  );
+  --app-bar-height: 3.75rem;
+  --tab-bar-height: 4.5rem;
+  /* Beasiswa Perintis design system surfaces */
+  --app-bg: #eaf4fc;
+  --surface-subtle: #eaf4fc;
+  --surface-border: #dce6f2;
+  --backdrop: #dce6f2;
+}
+
+/* Section titles are navy on white; explicit colors (hero) still win. */
+:where(.mantine-Title-root) {
+  color: #0f3e86;
 }
 
 html {
@@ -32,11 +30,6 @@ body {
 :where(a, button, input, textarea, select, [tabindex]):focus-visible {
   outline: 3px solid var(--mantine-primary-color-filled);
   outline-offset: 3px;
-}
-
-:root[data-mantine-color-scheme="light"] {
-  --mantine-color-dimmed: var(--mantine-color-gray-7);
-  --mantine-color-placeholder: var(--mantine-color-gray-6);
 }
 
 :where(button, a, [role="button"]) {
@@ -86,4 +79,9 @@ body {
 }
 .hscroll::-webkit-scrollbar {
   display: none;
+}
+
+/* First card over the blue hero band (status card in the design system). */
+.raised {
+  box-shadow: 0 6px 20px rgba(15, 62, 134, 0.12);
 }

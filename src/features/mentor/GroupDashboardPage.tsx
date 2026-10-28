@@ -19,6 +19,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { participantApi } from "@/api/endpoints";
 import type { DashboardRow } from "@/api/types";
+import { DisplayTitle, InfoPill, Quoted } from "@/components/brand";
 import { Screen } from "@/components/layout/Screen";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import {
@@ -110,24 +111,47 @@ export function GroupDashboardPage() {
   const due = deadlines(month);
   return (
     <Screen
-      title="Kelompok saya"
-      subtitle={
-        query.data
-          ? `Tingkat ${query.data.tingkat} · ${query.data.rows.length} mentee`
-          : undefined
-      }
+      title="Beasiswa Perintis"
+      subtitle="Mentor"
       actions={<RoleSwitcher />}
+      hero={
+        <Stack gap={4}>
+          <Text size="sm">Dasbor kelompok</Text>
+          <DisplayTitle>Kelompok saya</DisplayTitle>
+          <Quoted>
+            {query.data
+              ? `Tingkat ${query.data.tingkat} · ${query.data.rows.length} mentee`
+              : "Pembinaan Perintis"}
+          </Quoted>
+        </Stack>
+      }
     >
       <Stack gap="md">
-        <NativeSelect
-          aria-label="Bulan laporan"
-          value={month}
-          onChange={(e) => setMonth(e.currentTarget.value)}
-          data={reportMonths().map((m) => ({
-            value: m,
-            label: `Lapbul ${monthLabel(m)}`,
-          }))}
-        />
+        <Paper p="lg" radius="lg" withBorder={false} className="raised">
+          <NativeSelect
+            aria-label="Bulan laporan"
+            value={month}
+            onChange={(e) => setMonth(e.currentTarget.value)}
+            data={reportMonths().map((m) => ({
+              value: m,
+              label: `Lapbul ${monthLabel(m)}`,
+            }))}
+          />
+          {query.data && (
+            <>
+              <Title order={2} mt="md" mb="sm">
+                {query.data.toRespond
+                  ? `${query.data.toRespond} lapbul perlu ditanggapi`
+                  : "Semua lapbul sudah ditanggapi"}
+              </Title>
+              <InfoPill
+                icon={<IconClock size={17} />}
+                label={`Tenggat tanggapan · ${relativeDays(due.mentorDue)}`}
+                value={fmtDate(due.mentorDue, "dddd, D MMMM YYYY")}
+              />
+            </>
+          )}
+        </Paper>
         <Loadable query={query}>
           {(d) => {
             const flags = d.rows.filter(
@@ -137,28 +161,6 @@ export function GroupDashboardPage() {
             );
             return (
               <>
-                <Paper
-                  p="md"
-                  bg={d.toRespond ? "var(--mantine-color-blue-0)" : undefined}
-                >
-                  <Group wrap="nowrap" gap="sm">
-                    <ThemeIcon size={40} radius="md" variant="light">
-                      <IconClock size={22} />
-                    </ThemeIcon>
-                    <div>
-                      <Title order={3}>
-                        {d.toRespond
-                          ? `${d.toRespond} lapbul perlu ditanggapi`
-                          : "Semua lapbul terkirim sudah ditanggapi"}
-                      </Title>
-                      <Text size="sm" c="dimmed">
-                        Tenggat tanggapan{" "}
-                        {fmtDate(due.mentorDue, "dddd, D MMM")} ·{" "}
-                        {relativeDays(due.mentorDue)}
-                      </Text>
-                    </div>
-                  </Group>
-                </Paper>
                 {flags.map((r) => (
                   <FlagBox key={r.mentee.userId} row={r} />
                 ))}

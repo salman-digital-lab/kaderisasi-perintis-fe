@@ -348,7 +348,7 @@ export function ReportPage() {
             </Group>
             {d.report?.review && <ReviewSection detail={d} />}
             {d.unrespondedJournals > 0 && (
-              <Alert color="orange" variant="light">
+              <Alert color="yellow" variant="light">
                 {d.unrespondedJournals} lapbul terkirim belum ditanggapi.
                 Koordinator tidak bisa memverifikasi sebelum semuanya
                 ditanggapi.

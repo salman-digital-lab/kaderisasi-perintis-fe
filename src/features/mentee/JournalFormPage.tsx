@@ -796,7 +796,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
       return (
         <Stack gap="md">
           {missing.length ? (
-            <Alert color="orange" variant="light" title="Masih ada isian wajib">
+            <Alert color="yellow" variant="light" title="Masih ada isian wajib">
               <Stack gap="xs">
                 {missing.map((m) => (
                   <UnstyledButton
@@ -821,7 +821,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
             </Alert>
           )}
           {detail.window === "late" && !isRevision && (
-            <Alert color="orange" variant="light">
+            <Alert color="yellow" variant="light">
               Tenggat tanggal 5 sudah lewat; kiriman akan ditandai Terlambat.
             </Alert>
           )}
@@ -843,11 +843,10 @@ function Wizard({ detail }: { detail: JournalDetail }) {
       back={`/lapbul/${month}`}
       actions={
         <Badge
-          variant="light"
-          color={saving ? "gray" : "teal"}
+          variant="white"
+          color={saving ? "gray" : "blue"}
           leftSection={<IconCloudCheck size={14} />}
           tt="none"
-          radius="sm"
         >
           {saving
             ? "Menyimpan…"
@@ -899,7 +898,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
         </div>
         {isRevision && detail.journal?.response?.revisionRequest && (
           <Alert
-            color="orange"
+            color="yellow"
             variant="light"
             icon={<IconPencil size={18} />}
             title="Permintaan perbaikan mentor"

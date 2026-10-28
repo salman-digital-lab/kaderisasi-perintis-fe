@@ -9,8 +9,13 @@ selebar ponsel di layar lebar). Rencana berikutnya: PWA.
 
 ## Stack
 
-React 19 + Vite 7, Mantine 9 (tema mengikuti `kaderisasi-web-fe`: Inter, biru, radius md, target
-sentuh 44 px), TanStack Query 5, React Router 7, dayjs (zona Asia/Jakarta). Node 24.
+React 19 + Vite 7, Mantine 9, TanStack Query 5, React Router 7, dayjs (zona Asia/Jakarta). Node 24.
+
+Tampilan mengikuti **Beasiswa Perintis Design System**
+(https://claude.ai/artifact/2QfBnFgAs4wLeVVzr65hkC): Montserrat untuk judul (display miring kapital),
+Plus Jakarta Sans untuk isi; biru langit/navy sebagai dasar, emas dan jingga sebagai aksen; tombol
+kapsul, kartu radius 16, chip status bertitik, dan info pill bergaris emas. Token ada di
+`src/theme/theme.ts` (`BRAND`), komponen merek di `src/components/brand.tsx`.
 
 ## Menjalankan
 

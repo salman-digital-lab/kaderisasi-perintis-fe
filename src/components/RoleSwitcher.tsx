@@ -19,7 +19,7 @@ export function RoleSwitcher() {
     <Menu position="bottom-end" width={220}>
       <Menu.Target>
         <Button
-          variant="light"
+          variant="white"
           size="compact-md"
           rightSection={<IconChevronDown size={16} />}
           aria-label="Ganti peran"

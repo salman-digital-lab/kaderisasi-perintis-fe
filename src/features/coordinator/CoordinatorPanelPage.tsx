@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import {
+  IconCalendarEvent,
   IconAlertTriangle,
   IconShieldLock,
   IconTrendingDown,
@@ -18,6 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { participantApi } from "@/api/endpoints";
 import type { MentorTasks } from "@/api/types";
+import { DisplayTitle, InfoPill, Quoted } from "@/components/brand";
 import { Screen } from "@/components/layout/Screen";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { EmptyState, LinkRow, Loadable, StatusBadge } from "@/components/ui";
@@ -65,7 +67,7 @@ function Stat({
 }) {
   return (
     <Paper p="sm">
-      <Text size="xl" fw={800} c={tone}>
+      <Text size="xl" fw={800} ff="Montserrat, sans-serif" c={tone ?? "blue.7"}>
         {value}
       </Text>
       <Text size="xs" c="dimmed">
@@ -92,17 +94,39 @@ export function CoordinatorPanelPage() {
   const due = deadlines(month);
   return (
     <Screen
-      title="Panel koordinator"
-      subtitle={`Verifikasi paling lambat ${fmtDate(due.verifyDue, "D MMM")} · ${relativeDays(due.verifyDue)}`}
+      title="Beasiswa Perintis"
+      subtitle="Koordinator"
       actions={<RoleSwitcher />}
+      hero={
+        <Stack gap={4}>
+          <Text size="sm">Laporan mentoring {monthLabel(month)}</Text>
+          <DisplayTitle>Panel koordinator</DisplayTitle>
+          <Quoted>
+            {query.data
+              ? `${query.data.rows.length} mentor binaan`
+              : "Pembinaan Perintis"}
+          </Quoted>
+        </Stack>
+      }
     >
       <Stack gap="md">
-        <NativeSelect
-          aria-label="Bulan laporan"
-          value={month}
-          onChange={(e) => setMonth(e.currentTarget.value)}
-          data={reportMonths().map((m) => ({ value: m, label: monthLabel(m) }))}
-        />
+        <Paper p="lg" radius="lg" withBorder={false} className="raised">
+          <NativeSelect
+            aria-label="Bulan laporan"
+            value={month}
+            onChange={(e) => setMonth(e.currentTarget.value)}
+            data={reportMonths().map((m) => ({
+              value: m,
+              label: monthLabel(m),
+            }))}
+            mb="md"
+          />
+          <InfoPill
+            icon={<IconCalendarEvent size={17} />}
+            label={`Tenggat verifikasi · ${relativeDays(due.verifyDue)}`}
+            value={fmtDate(due.verifyDue, "dddd, D MMMM YYYY")}
+          />
+        </Paper>
         <Loadable query={query}>
           {(d) => {
             const waiting = d.rows.filter(

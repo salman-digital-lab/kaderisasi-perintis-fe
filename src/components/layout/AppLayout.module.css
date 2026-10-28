@@ -4,38 +4,39 @@
   max-width: var(--app-max-width);
   min-height: 100dvh;
   margin-inline: auto;
-  background: var(--mantine-color-body);
+  background: var(--app-bg);
 }
 @media (min-width: 40em) {
   .frame {
     box-shadow:
       0 0 0 1px var(--surface-border),
-      var(--mantine-shadow-md);
+      0 12px 40px rgba(15, 62, 134, 0.12);
   }
 }
 
+/* Sky 500 bar, white Montserrat title (header band of the design system). */
 .appBar {
   position: sticky;
   top: 0;
   z-index: 100;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.5rem;
   min-height: calc(var(--app-bar-height) + env(safe-area-inset-top, 0px));
-  padding: env(safe-area-inset-top, 0px) 0.5rem 0;
-  padding-left: max(0.5rem, env(safe-area-inset-left, 0px));
-  padding-right: max(0.5rem, env(safe-area-inset-right, 0px));
-  border-bottom: 1px solid var(--surface-border);
-  background: color-mix(in srgb, var(--mantine-color-body) 92%, transparent);
-  backdrop-filter: saturate(1.4) blur(10px);
+  padding: env(safe-area-inset-top, 0px) 0.75rem 0;
+  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+  background: #2f7dd1;
+  color: #ffffff;
 }
 .appBarTitle {
   flex: 1;
   min-width: 0;
-  padding-inline: 0.5rem;
+  padding-inline: 0.25rem;
 }
 .appBarTitle h1 {
   margin: 0;
+  font-family: Montserrat, sans-serif;
   font-size: 1.0625rem;
   font-weight: 800;
   line-height: 1.25;
@@ -46,10 +47,24 @@
 .appBarTitle p {
   margin: 0;
   font-size: 0.75rem;
-  color: var(--mantine-color-dimmed);
+  opacity: 0.92;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.barIcon {
+  color: #ffffff;
+}
+.barIcon:active {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.hero {
+  padding: 0.5rem 1.25rem 4rem;
+  padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+  background: #2f7dd1;
+  color: #ffffff;
 }
 
 .content {
@@ -60,9 +75,26 @@
     env(safe-area-inset-right, 0px)
   );
   padding-bottom: calc(
-    var(--mantine-spacing-xl) + var(--bottom-space, 0px) +
+    var(--mantine-spacing-md) + var(--bottom-space, 0px) +
       env(safe-area-inset-bottom, 0px)
   );
+}
+.content[data-overlap] {
+  margin-top: -3.25rem;
+  padding-top: 0;
+}
+
+/* Footer strip from the feed posts. */
+.strip {
+  margin: var(--mantine-spacing-lg) 0 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  color: #4a5b78;
+}
+.strip b {
+  color: #1f5fb8;
 }
 
 .footer {
@@ -76,7 +108,7 @@
   padding: 0.75rem var(--mantine-spacing-md);
   padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--surface-border);
-  background: var(--mantine-color-body);
+  background: #ffffff;
 }
 
 .tabBar {
@@ -90,9 +122,9 @@
   width: 100%;
   max-width: var(--app-max-width);
   transform: translateX(-50%);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding: 0 0.5rem env(safe-area-inset-bottom, 0px);
   border-top: 1px solid var(--surface-border);
-  background: var(--mantine-color-body);
+  background: #ffffff;
 }
 .tab {
   position: relative;
@@ -100,17 +132,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.125rem;
+  gap: 0.25rem;
   min-height: var(--tab-bar-height);
-  color: var(--mantine-color-dimmed);
+  color: #4a5b78;
   font-size: 0.6875rem;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
   user-select: none;
   -webkit-user-select: none;
 }
 .tab[aria-current="page"] {
-  color: var(--mantine-primary-color-filled);
+  color: #0f3e86;
 }
 .tabIcon {
   display: grid;
@@ -121,10 +153,10 @@
   transition: background-color 150ms ease;
 }
 .tab[aria-current="page"] .tabIcon {
-  background: var(--mantine-primary-color-light);
+  background: #dcebfa;
 }
 .tab:active .tabIcon {
-  background: var(--surface-subtle);
+  background: #eaf4fc;
 }
 .tabBadge {
   position: absolute;

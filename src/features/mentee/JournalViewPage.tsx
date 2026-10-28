@@ -71,7 +71,7 @@ function ResponseCard({ detail }: { detail: JournalDetail }) {
         {r.revisionRequest &&
           detail.journal!.status === "revision_requested" && (
             <Alert
-              color="orange"
+              color="yellow"
               variant="light"
               icon={<IconPencil size={18} />}
               title="Permintaan perbaikan"

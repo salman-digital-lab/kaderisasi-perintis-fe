@@ -90,7 +90,7 @@ function ReviewForm({ detail }: { detail: ReportDetail }) {
           onChange={(e) => setNote(e.currentTarget.value)}
         />
         {detail.unrespondedJournals > 0 && (
-          <Alert color="orange" variant="light">
+          <Alert color="yellow" variant="light">
             Masih ada {detail.unrespondedJournals} lapbul terkirim yang belum
             ditanggapi mentor; verifikasi akan ditolak sistem.
           </Alert>

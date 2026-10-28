@@ -22,6 +22,7 @@ import { Link } from "react-router";
 import { staffApi } from "@/api/endpoints";
 import { errorMessage } from "@/api/errors";
 import type { ExportKind } from "@/api/types";
+import { DisplayTitle, Quoted } from "@/components/brand";
 import { Screen } from "@/components/layout/Screen";
 import { EmptyState, Loadable, Section } from "@/components/ui";
 import { downloadCsv } from "@/lib/files";
@@ -54,7 +55,7 @@ function StatTile({
       style={{ textDecoration: "none", color: "inherit" }}
     >
       <Group justify="space-between" wrap="nowrap">
-        <Text size="xl" fw={800}>
+        <Text size="xl" fw={800} ff="Montserrat, sans-serif" c="blue.7">
           {value}
         </Text>
         {icon}
@@ -90,14 +91,29 @@ export function StaffDashboardPage() {
     );
 
   return (
-    <Screen title="Dasbor pemantauan" subtitle="Pengelola Perintis">
+    <Screen
+      title="Beasiswa Perintis"
+      subtitle="Pengelola Perintis"
+      hero={
+        <Stack gap={4}>
+          <Text size="sm">Rekap {monthLabel(month)}</Text>
+          <DisplayTitle>Dasbor pemantauan</DisplayTitle>
+          <Quoted>Pembinaan Perintis</Quoted>
+        </Stack>
+      }
+    >
       <Stack gap="md">
-        <NativeSelect
-          aria-label="Bulan laporan"
-          value={month}
-          onChange={(e) => setMonth(e.currentTarget.value)}
-          data={reportMonths().map((m) => ({ value: m, label: monthLabel(m) }))}
-        />
+        <Paper p="lg" radius="lg" withBorder={false} className="raised">
+          <NativeSelect
+            aria-label="Bulan laporan"
+            value={month}
+            onChange={(e) => setMonth(e.currentTarget.value)}
+            data={reportMonths().map((m) => ({
+              value: m,
+              label: monthLabel(m),
+            }))}
+          />
+        </Paper>
         <Loadable query={query}>
           {(d) => (
             <>

@@ -1,0 +1,95 @@
+.mark {
+  display: inline-flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #0f3e86;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  line-height: 1;
+  font-family: Montserrat, sans-serif;
+  box-sizing: border-box;
+}
+.markSmall {
+  font-size: 0.75em;
+  font-weight: 500;
+}
+.markBig {
+  font-size: 1em;
+  font-weight: 800;
+}
+
+.display {
+  font-family: Montserrat, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+.quoted {
+  font-family: Montserrat, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+.quote {
+  color: #ffd66b;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4a5b78;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 5px 14px 5px 5px;
+  border: 2.5px solid #f5b731;
+  border-radius: 999px;
+  background: #ffffff;
+}
+.pillIcon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: 999px;
+  background: #d9700c;
+  color: #ffffff;
+}
+.pillText {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.pillLabel {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #4a5b78;
+}
+.pillValue {
+  font-family: Montserrat, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #0f3e86;
+}
+
+.rule {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: #f5b731;
+}

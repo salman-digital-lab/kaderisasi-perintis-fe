@@ -1,8 +1,9 @@
-import { Paper, Text, Title } from "@mantine/core";
+import { Paper, Text } from "@mantine/core";
 import type { ReactNode } from "react";
+import { DisplayTitle, PerintisMark, Quoted } from "@/components/brand";
 import classes from "./auth.module.css";
 
-/** Same shape as kaderisasi-web-fe's AuthLayout: logo, card, help link. */
+/** Sky header band with the Perintis mark; the form card overlaps it. */
 export function AuthLayout({
   title,
   description,
@@ -16,31 +17,40 @@ export function AuthLayout({
 }) {
   return (
     <main className={classes.main}>
-      <div className={classes.logo}>
-        <img src="/bmka_logo_color.png" alt="BMKA Salman ITB" width={150} />
-      </div>
-      <Paper p="lg">
-        <header className={classes.header}>
-          <Text size="xs" fw={700} c="blue.8" tt="uppercase" lts={0.6}>
-            Pembinaan Beasiswa Perintis
-          </Text>
-          <Title order={1} size="h2" mt={4}>
-            {title}
-          </Title>
-          <Text c="dimmed" mt="xs" size="sm">
+      <header className={classes.hero}>
+        <div className={classes.brand}>
+          <PerintisMark size={48} />
+          <div>
+            <Text fw={800} ff="Montserrat, sans-serif" size="lg" lh={1.2}>
+              Beasiswa Perintis
+            </Text>
+            <Text size="sm" opacity={0.92}>
+              Rumah Amal Salman · BMKA Salman ITB
+            </Text>
+          </div>
+        </div>
+        <DisplayTitle size={34}>{title}</DisplayTitle>
+        <Quoted>Pembinaan Perintis</Quoted>
+      </header>
+      <div className={classes.body}>
+        <Paper p="lg" radius="lg" withBorder={false} className="raised">
+          <Text c="dimmed" size="sm" mb="lg">
             {description}
           </Text>
-        </header>
-        {children}
-      </Paper>
-      {footer}
-      <Text c="dimmed" size="sm" ta="center" mt="lg">
-        Butuh bantuan?{" "}
-        <a href="https://wa.me/6285156168499" className={classes.link}>
-          Hubungi admin melalui WhatsApp
-        </a>
-        .
-      </Text>
+          {children}
+        </Paper>
+        {footer}
+        <Text c="dimmed" size="sm" ta="center" mt="lg">
+          Butuh bantuan?{" "}
+          <a href="https://wa.me/6285156168499" className={classes.link}>
+            Hubungi admin melalui WhatsApp
+          </a>
+          .
+        </Text>
+        <p className={classes.strip}>
+          Merintis masa depan bersama <b>Beasiswa Perintis</b>
+        </p>
+      </div>
     </main>
   );
 }
