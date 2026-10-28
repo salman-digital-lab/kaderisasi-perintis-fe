@@ -24,7 +24,11 @@ import {
 import { PageLoader } from "@/components/ui";
 import { ROLE_HOME } from "@/lib/roles";
 import { AccountPage, StaffAccountPage } from "@/features/account/AccountPage";
-import { LoginPage, StaffLoginPage } from "@/features/auth/LoginPages";
+import {
+  GoogleCallbackPage,
+  LoginPage,
+  StaffLoginPage,
+} from "@/features/auth/LoginPages";
 import { CoordinatorPanelPage } from "@/features/coordinator/CoordinatorPanelPage";
 import { ReviewReportPage } from "@/features/coordinator/ReviewReportPage";
 import { JournalFormPage } from "@/features/mentee/JournalFormPage";
@@ -174,6 +178,7 @@ export function AppRoutes() {
       <Route element={<PlainLayout />}>
         <Route path="/masuk" element={<LoginPage />} />
         <Route path="/staf/masuk" element={<StaffLoginPage />} />
+        <Route path="/masuk/google" element={<GoogleCallbackPage />} />
       </Route>
 
       <Route element={<RequireParticipant />}>

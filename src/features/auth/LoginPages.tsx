@@ -3,6 +3,7 @@ import {
   Anchor,
   Button,
   Divider,
+  Loader,
   Modal,
   Paper,
   PasswordInput,
@@ -13,13 +14,20 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { IconBrandGoogle } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import { USE_MOCK } from "@/api/client";
 import { participantApi, staffApi } from "@/api/endpoints";
 import { errorMessage } from "@/api/errors";
 import { DEMO_ACCOUNTS, DEMO_STAFF } from "@/api/mock/demoAccounts";
 import { useAuth } from "@/auth/AuthProvider";
+import {
+  GOOGLE_CLIENT_ID,
+  startParticipantGoogle,
+  takeParticipantGoogle,
+  googleRedirectUri,
+  useGoogleButton,
+} from "@/auth/google";
 import { LinkRow, ListGroup } from "@/components/ui";
 import { AuthLayout } from "./AuthLayout";
 import classes from "./auth.module.css";
@@ -35,6 +43,7 @@ function LoginForm({ kind }: { kind: Kind }) {
   const api = kind === "participant" ? participantApi : staffApi;
   const accounts = kind === "participant" ? DEMO_ACCOUNTS : DEMO_STAFF;
   const home = kind === "participant" ? "/" : "/kelola";
+  const [startingGoogle, setStartingGoogle] = useState(false);
 
   const done = (token: string) => {
     if (kind === "participant") auth.signInParticipant(token);
@@ -53,6 +62,13 @@ function LoginForm({ kind }: { kind: Kind }) {
         : api.login(vars.email, vars.password ?? ""),
     onSuccess: ({ token }) => done(token),
   });
+  const staffGoogle = useMutation({
+    mutationFn: staffApi.loginGoogleCredential,
+    onSuccess: ({ token }) => done(token),
+  });
+  const googleButton = useGoogleButton((credential) =>
+    staffGoogle.mutate(credential),
+  );
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -61,8 +77,30 @@ function LoginForm({ kind }: { kind: Kind }) {
 
   return (
     <>
-      {/* Real Google sign-in needs Google Identity Services (not wired yet);
-          the mock simulates it with the demo accounts. */}
+      {!USE_MOCK && GOOGLE_CLIENT_ID && kind === "participant" && (
+        <>
+          <Button
+            fullWidth
+            variant="default"
+            leftSection={<IconBrandGoogle size={18} />}
+            loading={startingGoogle}
+            onClick={() => {
+              setStartingGoogle(true);
+              void startParticipantGoogle();
+            }}
+          >
+            Masuk dengan Google
+          </Button>
+          <Divider label="atau dengan email" labelPosition="center" my="md" />
+        </>
+      )}
+      {!USE_MOCK && GOOGLE_CLIENT_ID && kind === "staff" && (
+        <>
+          <div ref={googleButton} style={{ width: "100%", minHeight: 44 }} />
+          <Divider label="atau dengan email" labelPosition="center" my="md" />
+        </>
+      )}
+      {/* The mock simulates Google sign-in with the demo accounts. */}
       {USE_MOCK && (
         <>
           <Button
@@ -97,9 +135,9 @@ function LoginForm({ kind }: { kind: Kind }) {
             value={password}
             onChange={(e) => setPassword(e.currentTarget.value)}
           />
-          {login.isError && (
+          {(login.isError || staffGoogle.isError) && (
             <Alert color="red" variant="light">
-              {errorMessage(login.error)}
+              {errorMessage(login.error ?? staffGoogle.error)}
             </Alert>
           )}
           <Button type="submit" loading={login.isPending} fullWidth mt="xs">
@@ -199,6 +237,57 @@ export function StaffLoginPage() {
       }
     >
       <LoginForm kind="staff" />
+    </AuthLayout>
+  );
+}
+
+/** Google sends participants back here with a code (see auth/google.ts). */
+export function GoogleCallbackPage() {
+  const auth = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const started = useRef(false);
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+    const run = async () => {
+      try {
+        const flow = takeParticipantGoogle(
+          new URLSearchParams(window.location.search),
+        );
+        const { token } = await participantApi.loginGoogleCode({
+          ...flow,
+          redirectUri: googleRedirectUri(),
+        });
+        auth.signInParticipant(token);
+        navigate("/", { replace: true });
+      } catch (e) {
+        setError(errorMessage(e));
+      }
+    };
+    void run();
+  }, [auth, navigate]);
+  return (
+    <AuthLayout
+      title="Masuk"
+      description={
+        error
+          ? "Masuk dengan Google gagal."
+          : "Menyelesaikan masuk dengan Google…"
+      }
+    >
+      {error ? (
+        <Stack gap="sm">
+          <Alert color="red" variant="light">
+            {error}
+          </Alert>
+          <Button component={Link} to="/masuk" replace fullWidth>
+            Kembali ke halaman masuk
+          </Button>
+        </Stack>
+      ) : (
+        <Loader mx="auto" display="block" />
+      )}
     </AuthLayout>
   );
 }

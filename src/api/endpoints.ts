@@ -67,6 +67,19 @@ export const participantApi = {
   },
   loginGoogle: (email: string) =>
     web.post<{ token: string }>("/auth/google", { email }),
+  /** Real Google sign-in: the code from this app's own callback (PKCE). */
+  loginGoogleCode: async (input: {
+    code: string;
+    codeVerifier: string;
+    nonce: string;
+    redirectUri: string;
+  }) => {
+    const data = await web.post<{ token: { token: string } }>(
+      "/auth/google",
+      input,
+    );
+    return { token: data.token.token };
+  },
   me: () => web.get<Me>("/perintis/me"),
   myProfile: () => web.get<FullProfile>("/perintis/me/profile"),
   menteeProfile: (userId: number) =>
@@ -133,6 +146,13 @@ export const staffApi = {
   },
   loginGoogle: (email: string) =>
     admin.post<{ token: string }>("/auth/google", { email }),
+  /** Real Google sign-in: the Google Identity Services credential. */
+  loginGoogleCredential: async (credential: string) => {
+    const session = await admin.post<AdminSession>("/auth/google", {
+      credential,
+    });
+    return { token: session.access_token };
+  },
   me: async (): Promise<StaffUser> => {
     if (USE_MOCK) return admin.get<StaffUser>("/auth/me");
     const session = await admin.get<AdminSession>("/auth/me");

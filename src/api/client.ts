@@ -43,9 +43,19 @@ const CODE_MESSAGES: Record<string, string> = {
   FORBIDDEN: "Akunmu tidak punya izin untuk tindakan ini.",
   UNTRUSTED_ORIGIN: "Alamat aplikasi ini belum diizinkan oleh server.",
   GENERAL_ERROR: "Terjadi kesalahan. Coba lagi.",
+  GOOGLE_LOGIN_FAILED: "Gagal masuk dengan Google. Coba lagi.",
+  GOOGLE_LOGIN_EXPIRED: "Sesi masuk Google kedaluwarsa. Ulangi dari awal.",
+  GOOGLE_LOGIN_CANCELLED: "Masuk dengan Google dibatalkan.",
+  GOOGLE_LOGIN_UNAVAILABLE: "Masuk dengan Google belum tersedia.",
+  GOOGLE_LOGIN_NOT_CONFIGURED: "Masuk dengan Google belum tersedia.",
+  GOOGLE_EMAIL_PASSWORD_REQUIRED:
+    "Email ini bukan akun Google. Masuk dengan email dan kata sandi.",
+  GOOGLE_EMAIL_NOT_VERIFIED: "Email Google ini belum terverifikasi.",
+  GOOGLE_CREDENTIAL_INVALID: "Gagal masuk dengan Google. Coba lagi.",
+  GOOGLE_ACCOUNT_INACTIVE: "Akun ini sedang nonaktif.",
 };
 
-function failureMessage(status: number, message: string | undefined) {
+export function failureMessage(status: number, message: string | undefined) {
   if (message && CODE_MESSAGES[message]) return CODE_MESSAGES[message];
   if (status === 401) return CODE_MESSAGES.UNAUTHORIZED;
   if (message && !/^[A-Z_]+$/.test(message)) return message;
