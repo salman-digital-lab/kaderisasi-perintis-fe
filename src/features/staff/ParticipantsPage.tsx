@@ -14,7 +14,7 @@ import { useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { staffApi } from "@/api/endpoints";
 import type { ParticipantRow } from "@/api/types";
-import { DataTable, useDesktop, type Column } from "@/components/DataTable";
+import { DataTable, useTableLayout, type Column } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import {
   Avatarish,
@@ -104,7 +104,7 @@ const COLUMNS: Column<ParticipantRow>[] = [
 ];
 
 export function ParticipantsPage() {
-  const desktop = useDesktop();
+  const desktop = useTableLayout();
   const [params, setParams] = useSearchParams();
   const role = params.get("role") ?? "";
   const status = params.get("status") ?? "";

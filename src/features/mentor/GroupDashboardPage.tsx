@@ -22,7 +22,7 @@ import { Link } from "react-router";
 import { participantApi } from "@/api/endpoints";
 import type { DashboardRow } from "@/api/types";
 import { DisplayTitle, InfoPill } from "@/components/brand";
-import { DataTable, useDesktop, type Column } from "@/components/DataTable";
+import { DataTable, useTableLayout, type Column } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import {
@@ -193,7 +193,7 @@ const COLUMNS: Column<DashboardRow>[] = [
 ];
 
 export function GroupDashboardPage() {
-  const desktop = useDesktop();
+  const desktop = useTableLayout();
   const current = currentReportMonth();
   const [month, setMonth] = useState(current ?? "");
   const query = useQuery({

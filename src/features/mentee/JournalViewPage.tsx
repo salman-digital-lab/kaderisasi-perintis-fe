@@ -1,4 +1,13 @@
-import { Alert, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import {
+  Alert,
+  Button,
+  Grid,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { IconLock, IconHeartHandshake, IconPencil } from "@tabler/icons-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -99,19 +108,22 @@ export function JournalViewPage() {
     queryKey: ["p", "journal", month],
     queryFn: () => participantApi.myJournal(month),
   });
+  const sentStatus = query.data?.journal?.status;
+  const sent = !!sentStatus && sentStatus !== "draft";
   return (
     <Screen
       title={`Lapbul ${monthLabel(month)}`}
       subtitle="Catatan Perjalanan"
       back="/lapbul"
+      width={sent ? "wide" : "narrow"}
     >
       <Loadable query={query}>
         {(d) => {
           const j = d.journal;
           const status = j?.status ?? "not_started";
           const submitted = j && j.status !== "draft";
-          return (
-            <Stack gap="lg">
+          const summary = (
+            <>
               <Group justify="space-between">
                 <StatusBadge {...JOURNAL_STATUS[status]} />
                 {j?.submittedAt && (
@@ -140,14 +152,29 @@ export function JournalViewPage() {
               {!d.canEdit && !submitted && (
                 <Note icon={IconLock}>{d.lockedReason}</Note>
               )}
-              {submitted && j ? (
-                <JournalContent
-                  journal={j}
-                  previousTargets={d.previousTargets}
-                />
-              ) : (
-                !d.canEdit && <EmptyState title="Belum ada isian" />
-              )}
+            </>
+          );
+          if (submitted && j)
+            return (
+              <Grid gap="lg">
+                <Grid.Col span={{ base: 12, md: 4 }} order={{ base: 1, md: 2 }}>
+                  <Stack gap="lg" className="stickyAside stickyPane">
+                    {summary}
+                  </Stack>
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, md: 8 }} order={{ base: 2, md: 1 }}>
+                  <JournalContent
+                    journal={j}
+                    previousTargets={d.previousTargets}
+                  />
+                </Grid.Col>
+              </Grid>
+            );
+          // Nothing sent yet: one narrow column, as on phones.
+          return (
+            <Stack gap="lg">
+              {summary}
+              {!d.canEdit && <EmptyState title="Belum ada isian" />}
             </Stack>
           );
         }}

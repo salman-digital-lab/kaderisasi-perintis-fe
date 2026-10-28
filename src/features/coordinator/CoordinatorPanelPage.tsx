@@ -23,7 +23,7 @@ import { participantApi } from "@/api/endpoints";
 import { Link } from "react-router";
 import type { CoordinatorRow, MentorTasks } from "@/api/types";
 import { DisplayTitle, InfoPill } from "@/components/brand";
-import { DataTable, useDesktop, type Column } from "@/components/DataTable";
+import { DataTable, useTableLayout, type Column } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import {
@@ -89,7 +89,7 @@ function Stat({
 }
 
 export function CoordinatorPanelPage() {
-  const desktop = useDesktop();
+  const desktop = useTableLayout();
   const current = currentReportMonth();
   const [month, setMonth] = useState(current ?? "");
   const query = useQuery({

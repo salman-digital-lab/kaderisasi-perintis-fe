@@ -18,7 +18,12 @@ import { useState } from "react";
 import { staffApi } from "@/api/endpoints";
 import { errorMessage } from "@/api/errors";
 import type { ImportKind, ImportPreview, ImportPreviewRow } from "@/api/types";
-import { DataTable, useDesktop, type Column } from "@/components/DataTable";
+import {
+  DataTable,
+  useDesktop,
+  useTableLayout,
+  type Column,
+} from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import { StatusBadge } from "@/components/ui";
 import { downloadCsv } from "@/lib/files";
@@ -89,6 +94,7 @@ const PREVIEW_COLUMNS: Column<ImportPreviewRow>[] = [
 
 export function ImportPage() {
   const desktop = useDesktop();
+  const table = useTableLayout();
   const queryClient = useQueryClient();
   const [kind, setKind] = useState<ImportKind>("mentee");
   const [csv, setCsv] = useState(TEMPLATES.mentee.csv);
@@ -225,7 +231,7 @@ export function ImportPage() {
                     ) : null,
                   )}
                 </Group>
-                {desktop ? (
+                {table ? (
                   <DataTable
                     columns={PREVIEW_COLUMNS}
                     rows={preview.rows}

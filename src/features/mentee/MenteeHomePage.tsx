@@ -1,6 +1,7 @@
 import {
   Alert,
   Button,
+  Grid,
   Group,
   Paper,
   Stack,
@@ -125,6 +126,7 @@ export function MenteeHomePage() {
       title="Beasiswa Perintis"
       subtitle={fmtDate(now(), "dddd, D MMMM YYYY")}
       actions={<RoleSwitcher />}
+      width="wide"
       hero={
         <Stack gap={4}>
           <Text size="sm">Assalamu'alaikum, {firstName}</Text>
@@ -145,105 +147,114 @@ export function MenteeHomePage() {
         ) : (
           <Loadable query={detail}>
             {(d) => (
-              <>
-                <JournalCard detail={d} />
-                {unread.map((j) => (
-                  <Paper
-                    key={j.month}
-                    p="md"
-                    component={Link}
-                    to={`/lapbul/${j.month}`}
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    <Group wrap="nowrap" gap="sm">
-                      <ThemeIcon
-                        size={40}
-                        radius="md"
-                        color="teal"
-                        variant="light"
+              <Grid gap="lg">
+                <Grid.Col span={{ base: 12, md: 7 }}>
+                  <Stack gap="lg">
+                    <JournalCard detail={d} />
+                    {unread.map((j) => (
+                      <Paper
+                        key={j.month}
+                        p="md"
+                        component={Link}
+                        to={`/lapbul/${j.month}`}
+                        style={{ textDecoration: "none", color: "inherit" }}
                       >
-                        <IconMessageCircle size={22} />
-                      </ThemeIcon>
-                      <div style={{ flex: 1 }}>
-                        <Group gap={6}>
-                          <Text fw={700}>Tanggapan mentor</Text>
-                          <NewBadge />
+                        <Group wrap="nowrap" gap="sm">
+                          <ThemeIcon
+                            size={40}
+                            radius="md"
+                            color="teal"
+                            variant="light"
+                          >
+                            <IconMessageCircle size={22} />
+                          </ThemeIcon>
+                          <div style={{ flex: 1 }}>
+                            <Group gap={6}>
+                              <Text fw={700}>Tanggapan mentor</Text>
+                              <NewBadge />
+                            </Group>
+                            <Text size="sm" c="dimmed">
+                              Untuk Catatan Perjalanan {monthLabel(j.month)}
+                            </Text>
+                          </div>
+                          <IconChevronRight
+                            size={18}
+                            color="var(--mantine-color-dimmed)"
+                          />
                         </Group>
-                        <Text size="sm" c="dimmed">
-                          Untuk Catatan Perjalanan {monthLabel(j.month)}
-                        </Text>
-                      </div>
-                      <IconChevronRight
-                        size={18}
-                        color="var(--mantine-color-dimmed)"
-                      />
-                    </Group>
-                  </Paper>
-                ))}
-                <Paper p="lg">
-                  <Group gap="sm" wrap="nowrap" align="flex-start">
-                    <ThemeIcon
-                      size={40}
-                      radius="md"
-                      variant="light"
-                      color="violet"
-                    >
-                      <IconCalendarEvent size={22} />
-                    </ThemeIcon>
-                    <div>
-                      <Text size="xs" c="dimmed" fw={600}>
-                        Sesi kelompok {monthLabel(d.month)}
-                      </Text>
-                      <Text fw={700}>
-                        {d.autoData.session
-                          ? fmtDate(
-                              d.autoData.session.date,
-                              "dddd, D MMMM YYYY",
-                            )
-                          : "Belum dilaporkan mentor"}
-                      </Text>
-                      {d.autoData.session && (
-                        <Text size="sm" c="dimmed">
-                          {d.autoData.session.theme}
-                        </Text>
-                      )}
-                      <Text size="xs" c="dimmed" mt={4}>
-                        Jadwal sesi disepakati bersama mentor di luar aplikasi.
-                      </Text>
-                    </div>
-                  </Group>
-                </Paper>
-                <Paper p="lg">
-                  <Title order={3} mb="sm">
-                    Tanggal penting
-                  </Title>
-                  <Timeline
-                    bulletSize={18}
-                    lineWidth={2}
-                    active={
-                      [
-                        deadlines(d.month).opensAt,
-                        deadlines(d.month).menteeDue,
-                        deadlines(d.month).lockAt,
-                      ].filter((x) => now().isAfter(x)).length - 1
-                    }
-                  >
-                    <Timeline.Item
-                      title={`Tgl 1 · Lapbul ${monthLabel(d.month)} dibuka`}
-                    />
-                    <Timeline.Item title="Tgl 5 · Tenggat pengisian">
-                      <Text size="xs" c="dimmed">
-                        Setelahnya ditandai Terlambat
-                      </Text>
-                    </Timeline.Item>
-                    <Timeline.Item title="Tgl 12 · Lapbul terkunci">
-                      <Text size="xs" c="dimmed">
-                        Mentor menanggapi paling lambat tanggal ini
-                      </Text>
-                    </Timeline.Item>
-                  </Timeline>
-                </Paper>
-              </>
+                      </Paper>
+                    ))}
+                  </Stack>
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, md: 5 }}>
+                  <Stack gap="lg">
+                    <Paper p="lg">
+                      <Group gap="sm" wrap="nowrap" align="flex-start">
+                        <ThemeIcon
+                          size={40}
+                          radius="md"
+                          variant="light"
+                          color="violet"
+                        >
+                          <IconCalendarEvent size={22} />
+                        </ThemeIcon>
+                        <div>
+                          <Text size="xs" c="dimmed" fw={600}>
+                            Sesi kelompok {monthLabel(d.month)}
+                          </Text>
+                          <Text fw={700}>
+                            {d.autoData.session
+                              ? fmtDate(
+                                  d.autoData.session.date,
+                                  "dddd, D MMMM YYYY",
+                                )
+                              : "Belum dilaporkan mentor"}
+                          </Text>
+                          {d.autoData.session && (
+                            <Text size="sm" c="dimmed">
+                              {d.autoData.session.theme}
+                            </Text>
+                          )}
+                          <Text size="xs" c="dimmed" mt={4}>
+                            Jadwal sesi disepakati bersama mentor di luar
+                            aplikasi.
+                          </Text>
+                        </div>
+                      </Group>
+                    </Paper>
+                    <Paper p="lg">
+                      <Title order={3} mb="sm">
+                        Tanggal penting
+                      </Title>
+                      <Timeline
+                        bulletSize={18}
+                        lineWidth={2}
+                        active={
+                          [
+                            deadlines(d.month).opensAt,
+                            deadlines(d.month).menteeDue,
+                            deadlines(d.month).lockAt,
+                          ].filter((x) => now().isAfter(x)).length - 1
+                        }
+                      >
+                        <Timeline.Item
+                          title={`Tgl 1 · Lapbul ${monthLabel(d.month)} dibuka`}
+                        />
+                        <Timeline.Item title="Tgl 5 · Tenggat pengisian">
+                          <Text size="xs" c="dimmed">
+                            Setelahnya ditandai Terlambat
+                          </Text>
+                        </Timeline.Item>
+                        <Timeline.Item title="Tgl 12 · Lapbul terkunci">
+                          <Text size="xs" c="dimmed">
+                            Mentor menanggapi paling lambat tanggal ini
+                          </Text>
+                        </Timeline.Item>
+                      </Timeline>
+                    </Paper>
+                  </Stack>
+                </Grid.Col>
+              </Grid>
             )}
           </Loadable>
         )}

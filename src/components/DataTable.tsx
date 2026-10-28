@@ -10,11 +10,25 @@ import { useNavigate } from "react-router";
 
 const DESKTOP = "(min-width: 62em)";
 
-/** True on desktop widths (same breakpoint as the sidebar layout). */
-export function useDesktop() {
-  return useMediaQuery(DESKTOP, window.matchMedia(DESKTOP).matches, {
+const WIDE = "(min-width: 75em)";
+
+function useMatch(query: string) {
+  return useMediaQuery(query, window.matchMedia(query).matches, {
     getInitialValueInEffect: false,
   });
+}
+
+/** True on desktop widths (same breakpoint as the sidebar layout). */
+export function useDesktop() {
+  return useMatch(DESKTOP);
+}
+
+/**
+ * True when there is room for a table (75em and up). Narrower desktops keep
+ * the card list, which fits any width, instead of a table scrolling sideways.
+ */
+export function useTableLayout() {
+  return useMatch(WIDE);
 }
 
 export interface Column<T> {
@@ -61,11 +75,11 @@ export function DataTable<T>({
   }, [rows, columns, sort]);
 
   return (
-    <Table.ScrollContainer minWidth={minWidth}>
+    <Table.ScrollContainer minWidth={minWidth} type="native">
       <Table
         highlightOnHover={!!rowHref}
         verticalSpacing="sm"
-        horizontalSpacing="md"
+        horizontalSpacing="sm"
         bg="white"
         style={{ borderRadius: "var(--mantine-radius-md)" }}
         withTableBorder

@@ -16,8 +16,13 @@ lebar, dan bilah aksi menempel di bawah kolom konten. Rencana berikutnya: PWA.
   detail, `wide` (75rem) untuk daftar dan dasbor.
 - Pemilih peran pindah ke bawah menu samping; tombol di bilah atas disembunyikan (`hiddenFrom="md"`).
 - Halaman masuk tampil sebagai kartu di tengah layar.
-- Tata letak khusus desktop per halaman (tabel, tampilan terbelah) menyusul bertahap: staf →
-  mentor → koordinator → mentee.
+- Daftar yang panjang tampil sebagai tabel yang bisa diurutkan (`src/components/DataTable.tsx`)
+  mulai 75em; di antara 62em dan 75em daftar kartu ponsel tetap dipakai agar tabel tidak
+  bergeser ke samping. `useDesktop()` (62em) untuk tata letak dua kolom, `useTableLayout()`
+  (75em) untuk tabel.
+- Halaman baca + tindakan (tanggapi lapbul, periksa laporan, lapbul staf) memakai dua kolom:
+  isi di kiri, kolom aksi di kanan yang tetap terlihat saat menggulir (`stickyAside stickyPane`).
+- Urutan bagian di ponsel tidak berubah; cek di 375px dan 1440px setelah mengubah tata letak.
 
 ## Stack
 

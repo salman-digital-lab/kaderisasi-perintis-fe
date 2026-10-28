@@ -20,7 +20,7 @@ import { Link } from "react-router";
 import { staffApi } from "@/api/endpoints";
 import { errorMessage } from "@/api/errors";
 import type { FollowupItem } from "@/api/types";
-import { DataTable, useDesktop, type Column } from "@/components/DataTable";
+import { DataTable, useTableLayout, type Column } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import {
   EmptyState,
@@ -91,7 +91,7 @@ export function FollowupsPage() {
   const [status, setStatus] = useState("open");
   const [source, setSource] = useState("");
   const [active, setActive] = useState<FollowupItem | null>(null);
-  const desktop = useDesktop();
+  const desktop = useTableLayout();
   const columns: Column<FollowupItem>[] = [
     {
       key: "source",

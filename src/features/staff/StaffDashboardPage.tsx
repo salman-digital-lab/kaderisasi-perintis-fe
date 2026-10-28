@@ -23,7 +23,7 @@ import { Link } from "react-router";
 import { staffApi } from "@/api/endpoints";
 import { errorMessage } from "@/api/errors";
 import type { CoordinatorRecap, ExportKind } from "@/api/types";
-import { DataTable, useDesktop, type Column } from "@/components/DataTable";
+import { DataTable, useTableLayout, type Column } from "@/components/DataTable";
 import { DisplayTitle } from "@/components/brand";
 import { Screen } from "@/components/layout/Screen";
 import { EmptyState, Loadable, PageSection, Section } from "@/components/ui";
@@ -79,22 +79,15 @@ const COORDINATOR_COLUMNS: Column<CoordinatorRecap>[] = [
     header: "Koordinator",
     sortValue: (c) => c.coordinator.name,
     render: (c) => (
-      <Text fw={700} size="sm">
-        {c.coordinator.name}
-      </Text>
+      <>
+        <Text fw={700} size="sm">
+          {c.coordinator.name}
+        </Text>
+        <Text size="xs" c="dimmed">
+          {c.mentors} mentor · {c.mentees} mentee
+        </Text>
+      </>
     ),
-  },
-  {
-    key: "mentors",
-    header: "Mentor",
-    sortValue: (c) => c.mentors,
-    render: (c) => c.mentors,
-  },
-  {
-    key: "mentees",
-    header: "Mentee",
-    sortValue: (c) => c.mentees,
-    render: (c) => c.mentees,
   },
   {
     key: "submitted",
@@ -130,20 +123,21 @@ const COORDINATOR_COLUMNS: Column<CoordinatorRecap>[] = [
   },
   {
     key: "reports",
-    header: "Laporan diajukan",
-    sortValue: (c) => (c.mentors ? c.reportsSubmitted / c.mentors : 0),
-    render: (c) => `${c.reportsSubmitted}/${c.mentors}`,
-  },
-  {
-    key: "verified",
-    header: "Diverifikasi",
+    header: "Laporan mentor",
     sortValue: (c) => (c.mentors ? c.reportsVerified / c.mentors : 0),
-    render: (c) => `${c.reportsVerified}/${c.mentors}`,
+    render: (c) => (
+      <>
+        {c.reportsSubmitted}/{c.mentors} diajukan
+        <Text size="xs" c="dimmed">
+          {c.reportsVerified}/{c.mentors} diverifikasi
+        </Text>
+      </>
+    ),
   },
 ];
 
 export function StaffDashboardPage() {
-  const desktop = useDesktop();
+  const desktop = useTableLayout();
   const [month, setMonth] = useState(currentReportMonth() ?? "");
   const query = useQuery({
     queryKey: ["staff", "dashboard", month],
