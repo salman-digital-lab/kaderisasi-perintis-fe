@@ -60,7 +60,7 @@
 }
 
 .hero {
-  padding: 0.5rem 1.25rem 4rem;
+  padding: 0.25rem 1.25rem 3.25rem;
   padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
   padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
   background: #2f7dd1;
@@ -80,13 +80,13 @@
   );
 }
 .content[data-overlap] {
-  margin-top: -3.25rem;
+  margin-top: -2.5rem;
   padding-top: 0;
 }
 
 /* Footer strip from the feed posts. */
 .strip {
-  margin: var(--mantine-spacing-lg) 0 0;
+  margin: var(--mantine-spacing-xl) 0 0;
   font-size: 0.625rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;

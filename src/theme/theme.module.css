@@ -35,9 +35,9 @@
   font-weight: 700;
 }
 .chipLabel {
-  min-height: 2.75rem;
+  min-height: 2.25rem;
   height: auto;
-  padding-block: 0.5rem;
+  padding-block: 0.25rem;
   font-weight: 600;
 }
 

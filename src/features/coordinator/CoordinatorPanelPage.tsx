@@ -19,10 +19,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { participantApi } from "@/api/endpoints";
 import type { MentorTasks } from "@/api/types";
-import { DisplayTitle, InfoPill, Quoted } from "@/components/brand";
+import { DisplayTitle, InfoPill } from "@/components/brand";
 import { Screen } from "@/components/layout/Screen";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
-import { EmptyState, LinkRow, Loadable, StatusBadge } from "@/components/ui";
+import {
+  EmptyState,
+  LinkRow,
+  ListGroup,
+  Loadable,
+  StatusBadge,
+} from "@/components/ui";
 import { REPORT_STATUS, TASK_LABEL } from "@/content/labels";
 import {
   currentReportMonth,
@@ -101,11 +107,11 @@ export function CoordinatorPanelPage() {
         <Stack gap={4}>
           <Text size="sm">Laporan mentoring {monthLabel(month)}</Text>
           <DisplayTitle>Panel koordinator</DisplayTitle>
-          <Quoted>
-            {query.data
-              ? `${query.data.rows.length} mentor binaan`
-              : "Pembinaan Perintis"}
-          </Quoted>
+          {query.data && (
+            <Text size="sm" fw={600} opacity={0.92}>
+              {query.data.rows.length} mentor binaan
+            </Text>
+          )}
         </Stack>
       }
     >
@@ -163,7 +169,7 @@ export function CoordinatorPanelPage() {
                 </SimpleGrid>
                 <Title order={3}>Mentor binaan</Title>
                 {sorted.length ? (
-                  <Stack gap="xs">
+                  <ListGroup>
                     {sorted.map((r) => (
                       <LinkRow
                         key={r.mentor.userId}
@@ -218,7 +224,7 @@ export function CoordinatorPanelPage() {
                         }
                       />
                     ))}
-                  </Stack>
+                  </ListGroup>
                 ) : (
                   <EmptyState title="Belum ada mentor binaan" />
                 )}

@@ -1,6 +1,5 @@
 import {
   Alert,
-  Badge,
   Button,
   Checkbox,
   Chip,
@@ -20,6 +19,7 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
+  IconLock,
   IconAlertTriangle,
   IconCheck,
   IconCloudCheck,
@@ -49,7 +49,7 @@ import type {
 } from "@/api/types";
 import { useMe } from "@/auth/AuthProvider";
 import { Screen } from "@/components/layout/Screen";
-import { KeyValue, Loadable, MultilineText, PageLoader } from "@/components/ui";
+import { KeyValue, Loadable, MultilineText, Note } from "@/components/ui";
 import { CATEGORY_LABEL } from "@/content/labels";
 import {
   allMissing,
@@ -839,31 +839,15 @@ function Wizard({ detail }: { detail: JournalDetail }) {
   return (
     <Screen
       title={title}
-      subtitle={`${step.section} · ${step.title}`}
+      subtitle="Catatan Perjalanan"
       back={`/lapbul/${month}`}
-      actions={
-        <Badge
-          variant="white"
-          color={saving ? "gray" : "blue"}
-          leftSection={<IconCloudCheck size={14} />}
-          tt="none"
-        >
-          {saving
-            ? "Menyimpan…"
-            : savedAt
-              ? `Tersimpan ${fmtDateTime(savedAt).split(", ")[1] ?? ""}`
-              : "Draf"}
-        </Badge>
-      }
       footer={
         <Group grow gap="sm">
-          <Button
-            variant="default"
-            disabled={stepIndex === 0}
-            onClick={() => goTo((i) => i - 1)}
-          >
-            Kembali
-          </Button>
+          {stepIndex > 0 && (
+            <Button variant="default" onClick={() => goTo((i) => i - 1)}>
+              Kembali
+            </Button>
+          )}
           {isLast ? (
             <Button
               disabled={missing.length > 0}
@@ -884,11 +868,16 @@ function Wizard({ detail }: { detail: JournalDetail }) {
             <Text size="xs" c="dimmed" fw={600}>
               Langkah {stepIndex + 1} dari {steps.length}
             </Text>
-            {stepMissing.length > 0 && step.key !== "tinjau" && (
-              <Text size="xs" c="orange.8" fw={600}>
-                {stepMissing.length} isian wajib belum terisi
+            <Group gap={4} c="dimmed" wrap="nowrap">
+              <IconCloudCheck size={14} />
+              <Text size="xs" fw={600}>
+                {saving
+                  ? "Menyimpan…"
+                  : savedAt
+                    ? `Tersimpan ${fmtDateTime(savedAt).split(", ")[1] ?? ""}`
+                    : "Draf"}
               </Text>
-            )}
+            </Group>
           </Group>
           <Progress
             value={((stepIndex + 1) / steps.length) * 100}
@@ -908,9 +897,16 @@ function Wizard({ detail }: { detail: JournalDetail }) {
             </MultilineText>
           </Alert>
         )}
-        <Title order={2} size="h3">
-          {step.title}
-        </Title>
+        <div>
+          <Title order={2} size="h3">
+            {step.title}
+          </Title>
+          {stepMissing.length > 0 && step.key !== "tinjau" && (
+            <Text size="xs" c="orange.8" fw={600} mt={4}>
+              {stepMissing.length} isian wajib belum terisi
+            </Text>
+          )}
+        </div>
         {body[step.key]()}
       </Stack>
     </Screen>
@@ -924,10 +920,10 @@ export function JournalFormPage() {
     queryFn: () => participantApi.myJournal(month),
     staleTime: 0,
   });
-  if (query.isPending)
+  if (query.isPending || query.isError)
     return (
       <Screen title={`Lapbul ${monthLabel(month)}`} back={`/lapbul/${month}`}>
-        <PageLoader />
+        <Loadable query={query}>{() => null}</Loadable>
       </Screen>
     );
   return (
@@ -941,9 +937,7 @@ export function JournalFormPage() {
             back={`/lapbul/${month}`}
           >
             <Stack>
-              <Alert color="gray" variant="light">
-                {d.lockedReason}
-              </Alert>
+              <Note icon={IconLock}>{d.lockedReason}</Note>
               <Button component={Link} to={`/lapbul/${month}`} variant="light">
                 Lihat Catatan Perjalanan
               </Button>

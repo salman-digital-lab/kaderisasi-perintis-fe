@@ -1,9 +1,5 @@
 import { Alert, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
-import {
-  IconAlertTriangle,
-  IconHeartHandshake,
-  IconPencil,
-} from "@tabler/icons-react";
+import { IconLock, IconHeartHandshake, IconPencil } from "@tabler/icons-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
@@ -15,6 +11,7 @@ import {
   Loadable,
   MultilineText,
   NewBadge,
+  Note,
   StatusBadge,
 } from "@/components/ui";
 import { JOURNAL_STATUS } from "@/content/labels";
@@ -141,13 +138,7 @@ export function JournalViewPage() {
                 </Button>
               )}
               {!d.canEdit && !submitted && (
-                <Alert
-                  color="gray"
-                  variant="light"
-                  icon={<IconAlertTriangle size={18} />}
-                >
-                  {d.lockedReason}
-                </Alert>
+                <Note icon={IconLock}>{d.lockedReason}</Note>
               )}
               {submitted && j ? (
                 <JournalContent

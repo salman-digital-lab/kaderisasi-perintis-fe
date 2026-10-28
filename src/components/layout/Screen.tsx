@@ -87,7 +87,7 @@ export function Screen({
         style={{ "--bottom-space": bottomSpace } as CSSProperties}
       >
         {children}
-        {!footer && (
+        {hero && (
           <p className={classes.strip}>
             Merintis masa depan bersama <b>Beasiswa Perintis</b>
           </p>

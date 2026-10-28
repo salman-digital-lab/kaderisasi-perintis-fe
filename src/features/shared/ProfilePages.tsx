@@ -28,6 +28,7 @@ import {
   EmptyState,
   KeyValue,
   Loadable,
+  Note,
   Section,
   StatusBadge,
 } from "@/components/ui";
@@ -325,10 +326,10 @@ export function MenteeProfilePage({ back }: { back: string }) {
         {(data) => (
           <Stack gap="md">
             {data.sensitiveHidden && (
-              <Alert color="gray" variant="light" icon={<IconLock size={18} />}>
+              <Note icon={IconLock}>
                 Sebagai koordinator, data ekonomi, keluarga, dan kesehatan tidak
                 ditampilkan.
-              </Alert>
+              </Note>
             )}
             <ProfileView data={data} />
           </Stack>

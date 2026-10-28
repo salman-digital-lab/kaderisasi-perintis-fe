@@ -15,7 +15,7 @@ export async function mockRequest<T>(
   body: unknown,
   token: string | null,
 ): Promise<T> {
-  await sleep(180 + Math.random() * 220);
+  await sleep(60 + Math.random() * 120);
   const escalated = escalateFlags();
   const { result, mutated } = dispatch(
     target,

@@ -9,7 +9,11 @@ import {
   Timeline,
   Title,
 } from "@mantine/core";
-import { IconCalendarEvent, IconMessageCircle } from "@tabler/icons-react";
+import {
+  IconCalendarEvent,
+  IconChevronRight,
+  IconMessageCircle,
+} from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { participantApi } from "@/api/endpoints";
@@ -17,7 +21,7 @@ import type { JournalDetail } from "@/api/types";
 import { useMe } from "@/auth/AuthProvider";
 import { Screen } from "@/components/layout/Screen";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
-import { DisplayTitle, Eyebrow, InfoPill, Quoted } from "@/components/brand";
+import { DisplayTitle, Eyebrow, InfoPill } from "@/components/brand";
 import { EmptyState, Loadable, NewBadge, StatusBadge } from "@/components/ui";
 import { JOURNAL_STATUS } from "@/content/labels";
 import { estimatedMinutes } from "@/content/lapbulForm";
@@ -125,8 +129,7 @@ export function MenteeHomePage() {
         <Stack gap={4}>
           <Text size="sm">Assalamu'alaikum, {firstName}</Text>
           <DisplayTitle>Terus melangkah, catat perjalananmu</DisplayTitle>
-          <Quoted>Pembinaan Perintis</Quoted>
-          <Text size="xs" mt={6} opacity={0.92}>
+          <Text size="xs" mt={4} opacity={0.92}>
             {me.mentor ? `Mentor ${me.mentor.name}` : "Belum ada mentor"}
             {me.coordinator ? ` · Koordinator ${me.coordinator.name}` : ""}
           </Text>
@@ -170,11 +173,15 @@ export function MenteeHomePage() {
                           Untuk Catatan Perjalanan {monthLabel(j.month)}
                         </Text>
                       </div>
+                      <IconChevronRight
+                        size={18}
+                        color="var(--mantine-color-dimmed)"
+                      />
                     </Group>
                   </Paper>
                 ))}
                 <Paper p="md">
-                  <Group gap="sm" wrap="nowrap" mb="sm">
+                  <Group gap="sm" wrap="nowrap" align="flex-start">
                     <ThemeIcon
                       size={40}
                       radius="md"
@@ -200,11 +207,11 @@ export function MenteeHomePage() {
                           {d.autoData.session.theme}
                         </Text>
                       )}
+                      <Text size="xs" c="dimmed" mt={4}>
+                        Jadwal sesi disepakati bersama mentor di luar aplikasi.
+                      </Text>
                     </div>
                   </Group>
-                  <Text size="xs" c="dimmed">
-                    Jadwal sesi disepakati bersama mentor di luar aplikasi.
-                  </Text>
                 </Paper>
                 <Paper p="md">
                   <Title order={3} mb="sm">

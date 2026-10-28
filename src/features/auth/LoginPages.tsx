@@ -20,7 +20,7 @@ import { participantApi, staffApi } from "@/api/endpoints";
 import { errorMessage } from "@/api/errors";
 import { DEMO_ACCOUNTS, DEMO_STAFF } from "@/api/mock/demoAccounts";
 import { useAuth } from "@/auth/AuthProvider";
-import { LinkRow } from "@/components/ui";
+import { LinkRow, ListGroup } from "@/components/ui";
 import { AuthLayout } from "./AuthLayout";
 import classes from "./auth.module.css";
 
@@ -133,7 +133,7 @@ function LoginForm({ kind }: { kind: Kind }) {
             Data contoh disimpan di peramban ini. Pilih akun untuk langsung
             masuk.
           </Text>
-          <Stack gap={6}>
+          <ListGroup>
             {accounts.map((a) => (
               <LinkRow
                 key={a.email}
@@ -144,7 +144,7 @@ function LoginForm({ kind }: { kind: Kind }) {
                 }
               />
             ))}
-          </Stack>
+          </ListGroup>
         </Paper>
       )}
     </>

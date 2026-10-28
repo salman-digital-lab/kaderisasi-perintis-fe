@@ -3,10 +3,9 @@ import {
   Badge,
   Box,
   Button,
-  Center,
   Group,
-  Loader,
   Paper,
+  Skeleton,
   Stack,
   Text,
   ThemeIcon,
@@ -18,6 +17,7 @@ import {
   IconAlertCircle,
   IconChevronRight,
   IconInbox,
+  IconInfoCircle,
   type Icon,
 } from "@tabler/icons-react";
 import type { UseQueryResult } from "@tanstack/react-query";
@@ -201,11 +201,39 @@ export function ErrorState({
   );
 }
 
-export function PageLoader() {
+/** Placeholder cards shaped like the content, instead of a lone spinner. */
+export function PageLoader({ rows = 3 }: { rows?: number }) {
   return (
-    <Center py={64}>
-      <Loader size="md" />
-    </Center>
+    <Stack gap="sm" aria-busy="true" aria-label="Memuat">
+      {Array.from({ length: rows }, (_, i) => (
+        <div key={i} className={classes.skeletonCard}>
+          <Skeleton height={14} width="40%" radius="xl" />
+          <Skeleton height={12} width="75%" radius="xl" mt={12} />
+          <Skeleton height={12} width="55%" radius="xl" mt={8} />
+        </div>
+      ))}
+    </Stack>
+  );
+}
+
+/** Rows of LinkRow inside one card, split by hairlines. */
+export function ListGroup({ children }: { children: ReactNode }) {
+  return <div className={classes.list}>{children}</div>;
+}
+
+/** Quiet helper text for hints that don't need a boxed alert. */
+export function Note({
+  children,
+  icon: IconCmp = IconInfoCircle,
+}: {
+  children: ReactNode;
+  icon?: Icon;
+}) {
+  return (
+    <div className={classes.note}>
+      <IconCmp size={16} />
+      <div>{children}</div>
+    </div>
   );
 }
 

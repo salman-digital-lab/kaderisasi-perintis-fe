@@ -1,4 +1,4 @@
-import { Group, Stack, Text } from "@mantine/core";
+import { Group, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { participantApi } from "@/api/endpoints";
 import { Screen } from "@/components/layout/Screen";
@@ -6,6 +6,7 @@ import { RoleSwitcher } from "@/components/RoleSwitcher";
 import {
   EmptyState,
   LinkRow,
+  ListGroup,
   Loadable,
   NewBadge,
   StatusBadge,
@@ -27,7 +28,7 @@ export function JournalListPage() {
       <Loadable query={query}>
         {(items) =>
           items.length ? (
-            <Stack gap="xs">
+            <ListGroup>
               {items.map((item) => (
                 <LinkRow
                   key={item.month}
@@ -51,7 +52,7 @@ export function JournalListPage() {
                   right={item.responseUnread ? <NewBadge /> : null}
                 />
               ))}
-            </Stack>
+            </ListGroup>
           ) : (
             <EmptyState
               title="Belum ada bulan laporan"

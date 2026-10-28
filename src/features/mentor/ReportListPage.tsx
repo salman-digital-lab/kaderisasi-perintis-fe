@@ -6,6 +6,7 @@ import { RoleSwitcher } from "@/components/RoleSwitcher";
 import {
   EmptyState,
   LinkRow,
+  ListGroup,
   Loadable,
   NewBadge,
   StatusBadge,
@@ -27,7 +28,7 @@ export function ReportListPage() {
       <Loadable query={query}>
         {(items) =>
           items.length ? (
-            <Stack gap="xs">
+            <ListGroup>
               {items.map((item, i) => {
                 const due = deadlines(item.month).reportDue;
                 const pending =
@@ -66,7 +67,7 @@ export function ReportListPage() {
                   />
                 );
               })}
-            </Stack>
+            </ListGroup>
           ) : (
             <EmptyState title="Belum ada bulan laporan" />
           )

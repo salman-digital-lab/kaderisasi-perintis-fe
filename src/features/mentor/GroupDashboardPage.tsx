@@ -1,5 +1,4 @@
 import {
-  Alert,
   Button,
   Group,
   NativeSelect,
@@ -19,14 +18,16 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { participantApi } from "@/api/endpoints";
 import type { DashboardRow } from "@/api/types";
-import { DisplayTitle, InfoPill, Quoted } from "@/components/brand";
+import { DisplayTitle, InfoPill } from "@/components/brand";
 import { Screen } from "@/components/layout/Screen";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import {
   Avatarish,
   EmptyState,
   LinkRow,
+  ListGroup,
   Loadable,
+  Note,
   StatusBadge,
 } from "@/components/ui";
 import {
@@ -118,11 +119,11 @@ export function GroupDashboardPage() {
         <Stack gap={4}>
           <Text size="sm">Dasbor kelompok</Text>
           <DisplayTitle>Kelompok saya</DisplayTitle>
-          <Quoted>
-            {query.data
-              ? `Tingkat ${query.data.tingkat} · ${query.data.rows.length} mentee`
-              : "Pembinaan Perintis"}
-          </Quoted>
+          {query.data && (
+            <Text size="sm" fw={600} opacity={0.92}>
+              Tingkat {query.data.tingkat} · {query.data.rows.length} mentee
+            </Text>
+          )}
         </Stack>
       }
     >
@@ -169,7 +170,7 @@ export function GroupDashboardPage() {
                     Mentee
                   </Title>
                   {d.rows.length ? (
-                    <Stack gap="xs">
+                    <ListGroup>
                       {d.rows.map((r) => {
                         const canOpen =
                           r.journalId &&
@@ -212,7 +213,7 @@ export function GroupDashboardPage() {
                           />
                         );
                       })}
-                    </Stack>
+                    </ListGroup>
                   ) : (
                     <EmptyState
                       title="Belum ada mentee"
@@ -220,10 +221,10 @@ export function GroupDashboardPage() {
                     />
                   )}
                 </div>
-                <Alert variant="light" color="gray">
+                <Note>
                   Lapbul yang sudah terkirim bisa dibuka untuk ditanggapi.
                   Mentee yang belum mengisi membuka profilnya.
-                </Alert>
+                </Note>
               </>
             );
           }}

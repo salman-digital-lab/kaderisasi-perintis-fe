@@ -2,6 +2,7 @@ import { Button, Menu } from "@mantine/core";
 import {
   IconCheck,
   IconChevronDown,
+  IconLogout,
   IconShieldCheck,
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router";
@@ -9,12 +10,12 @@ import { useAuth } from "@/auth/AuthProvider";
 import { ROLE_LABEL } from "@/content/labels";
 import { ROLE_HOME } from "@/lib/roles";
 
-/** Header role picker: only roles the person holds, plus the staff area when signed in. */
+/** Header account menu: the roles the person holds, the staff area, and switching accounts. */
 export function RoleSwitcher() {
-  const { me, activeRole, setActiveRole, hasStaff } = useAuth();
+  const { me, activeRole, setActiveRole, hasStaff, signOutParticipant } =
+    useAuth();
   const navigate = useNavigate();
   const roles = me?.roles ?? [];
-  if (roles.length < 2 && !hasStaff) return null;
   return (
     <Menu position="bottom-end" width={220}>
       <Menu.Target>
@@ -52,6 +53,16 @@ export function RoleSwitcher() {
             </Menu.Item>
           </>
         )}
+        <Menu.Divider />
+        <Menu.Item
+          leftSection={<IconLogout size={16} />}
+          onClick={() => {
+            signOutParticipant();
+            navigate("/masuk");
+          }}
+        >
+          Ganti akun
+        </Menu.Item>
       </Menu.Dropdown>
     </Menu>
   );

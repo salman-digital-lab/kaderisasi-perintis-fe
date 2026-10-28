@@ -10,6 +10,7 @@ import {
   Avatarish,
   EmptyState,
   LinkRow,
+  ListGroup,
   Loadable,
   StatusBadge,
 } from "@/components/ui";
@@ -94,48 +95,50 @@ export function ParticipantsPage() {
           {(rows) =>
             rows.length ? (
               <Stack gap="xs">
-                <Text size="xs" c="dimmed">
+                <Text size="xs" c="dimmed" px={4}>
                   {rows.length} peserta
                 </Text>
-                {rows.map((r) => (
-                  <LinkRow
-                    key={r.userId}
-                    to={`/kelola/peserta/${r.userId}`}
-                    icon={<Avatarish name={r.name} />}
-                    title={r.name}
-                    description={
-                      <Stack gap={4}>
-                        <Text size="xs" c="dimmed" lineClamp={1}>
-                          {r.roles.map((x) => ROLE_LABEL[x]).join(" + ")}
-                          {r.nim ? ` · ${r.nim}` : ""}
-                          {r.roles.includes("mentee")
-                            ? ` · mentor ${r.mentorName ?? "—"}`
-                            : ""}
-                          {r.roles.includes("mentor")
-                            ? ` · ${r.menteeCount} mentee`
-                            : ""}
-                        </Text>
-                        <Group gap={6}>
-                          <StatusBadge {...PARTICIPANT_STATUS[r.status]} />
-                          {!r.hasAccount && (
-                            <StatusBadge
-                              label="Akun belum aktif"
-                              tone="gray"
-                              variant="outline"
-                            />
-                          )}
-                          {r.roles.includes("mentee") && !r.clubOk && (
-                            <StatusBadge
-                              label="Belum ada club"
-                              tone="orange"
-                              variant="outline"
-                            />
-                          )}
-                        </Group>
-                      </Stack>
-                    }
-                  />
-                ))}
+                <ListGroup>
+                  {rows.map((r) => (
+                    <LinkRow
+                      key={r.userId}
+                      to={`/kelola/peserta/${r.userId}`}
+                      icon={<Avatarish name={r.name} />}
+                      title={r.name}
+                      description={
+                        <Stack gap={4}>
+                          <Text size="xs" c="dimmed" lineClamp={1}>
+                            {r.roles.map((x) => ROLE_LABEL[x]).join(" + ")}
+                            {r.nim ? ` · ${r.nim}` : ""}
+                            {r.roles.includes("mentee")
+                              ? ` · mentor ${r.mentorName ?? "—"}`
+                              : ""}
+                            {r.roles.includes("mentor")
+                              ? ` · ${r.menteeCount} mentee`
+                              : ""}
+                          </Text>
+                          <Group gap={6}>
+                            <StatusBadge {...PARTICIPANT_STATUS[r.status]} />
+                            {!r.hasAccount && (
+                              <StatusBadge
+                                label="Akun belum aktif"
+                                tone="gray"
+                                variant="outline"
+                              />
+                            )}
+                            {r.roles.includes("mentee") && !r.clubOk && (
+                              <StatusBadge
+                                label="Belum ada club"
+                                tone="orange"
+                                variant="outline"
+                              />
+                            )}
+                          </Group>
+                        </Stack>
+                      }
+                    />
+                  ))}
+                </ListGroup>
               </Stack>
             ) : (
               <EmptyState

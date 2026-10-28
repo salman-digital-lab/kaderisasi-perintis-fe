@@ -16,6 +16,7 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import {
+  IconLock,
   IconAlertTriangle,
   IconCheck,
   IconLifebuoy,
@@ -33,6 +34,7 @@ import {
   EmptyState,
   Loadable,
   MultilineText,
+  Note,
   PulseBars,
   StatusBadge,
 } from "@/components/ui";
@@ -185,11 +187,7 @@ function ResponseForm({ data }: { data: JournalForMentor }) {
     (decision !== "flagged" || flagReason.trim());
 
   if (!data.canRespond)
-    return (
-      <Alert color="gray" variant="light">
-        {data.respondLockedReason}
-      </Alert>
-    );
+    return <Note icon={IconLock}>{data.respondLockedReason}</Note>;
 
   return (
     <Stack gap="md">

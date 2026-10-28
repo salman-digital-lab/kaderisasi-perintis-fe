@@ -132,3 +132,40 @@
   background: transparent;
   box-shadow: inset 0 0 0 1.5px var(--chip-dot);
 }
+
+/* Grouped list: one card, rows split by hairlines (inset list). */
+.list {
+  overflow: hidden;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--mantine-radius-md);
+  background: #ffffff;
+}
+.list > .rowButton {
+  border: 0;
+  border-radius: 0;
+}
+.list > .rowButton + .rowButton {
+  box-shadow: inset 0 1px 0 var(--surface-border);
+}
+
+/* Quiet helper note: no box, just an icon and dimmed text. */
+.note {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding-inline: 0.25rem;
+  color: var(--mantine-color-dimmed);
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.45;
+}
+.note svg {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.skeletonCard {
+  padding: var(--mantine-spacing-md);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--mantine-radius-md);
+  background: #ffffff;
+}

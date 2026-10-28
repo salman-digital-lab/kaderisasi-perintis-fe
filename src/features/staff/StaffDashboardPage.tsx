@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Group,
   NativeSelect,
@@ -22,7 +23,7 @@ import { Link } from "react-router";
 import { staffApi } from "@/api/endpoints";
 import { errorMessage } from "@/api/errors";
 import type { ExportKind } from "@/api/types";
-import { DisplayTitle, Quoted } from "@/components/brand";
+import { DisplayTitle } from "@/components/brand";
 import { Screen } from "@/components/layout/Screen";
 import { EmptyState, Loadable, Section } from "@/components/ui";
 import { downloadCsv } from "@/lib/files";
@@ -52,6 +53,8 @@ function StatTile({
       p="sm"
       component={Link}
       to={to}
+      withBorder={false}
+      bg="gray.0"
       style={{ textDecoration: "none", color: "inherit" }}
     >
       <Group justify="space-between" wrap="nowrap">
@@ -98,7 +101,6 @@ export function StaffDashboardPage() {
         <Stack gap={4}>
           <Text size="sm">Rekap {monthLabel(month)}</Text>
           <DisplayTitle>Dasbor pemantauan</DisplayTitle>
-          <Quoted>Pembinaan Perintis</Quoted>
         </Stack>
       }
     >
@@ -113,10 +115,8 @@ export function StaffDashboardPage() {
               label: monthLabel(m),
             }))}
           />
-        </Paper>
-        <Loadable query={query}>
-          {(d) => (
-            <>
+          {query.data && (
+            <Box mt="sm">
               <SimpleGrid cols={2} spacing="xs">
                 <StatTile
                   to="/kelola/tindak-lanjut"
@@ -126,7 +126,7 @@ export function StaffDashboardPage() {
                       color="var(--mantine-color-red-7)"
                     />
                   }
-                  value={d.followupsOpen}
+                  value={query.data.followupsOpen}
                   label="Perlu tindak lanjut"
                 />
                 <StatTile
@@ -137,10 +137,16 @@ export function StaffDashboardPage() {
                       color="var(--mantine-color-orange-7)"
                     />
                   }
-                  value={d.withoutMentor}
+                  value={query.data.withoutMentor}
                   label="Mentee tanpa mentor"
                 />
               </SimpleGrid>
+            </Box>
+          )}
+        </Paper>
+        <Loadable query={query}>
+          {(d) => (
+            <>
               <Section
                 title="Indikator"
                 description={`Bab 5.2 · ${monthLabel(d.month)}`}

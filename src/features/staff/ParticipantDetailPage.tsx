@@ -36,6 +36,7 @@ import {
   Avatarish,
   KeyValue,
   LinkRow,
+  ListGroup,
   Loadable,
   Section,
   StatusBadge,
@@ -383,9 +384,9 @@ export function ParticipantDetailPage() {
                   </div>
                 </Group>
                 {p.inactiveReason && (
-                  <Alert color="gray" variant="light" mt="sm">
+                  <Text size="sm" c="dimmed" mt="sm">
                     {p.inactiveReason}
-                  </Alert>
+                  </Text>
                 )}
               </Paper>
               <Group grow gap="xs">
@@ -452,7 +453,7 @@ export function ParticipantDetailPage() {
                   description={`Koordinator: ${d.row.coordinatorName ?? "—"}`}
                 >
                   {d.mentees.length ? (
-                    <Stack gap="xs">
+                    <ListGroup>
                       {d.mentees.map((m) => (
                         <LinkRow
                           key={m.userId}
@@ -460,7 +461,7 @@ export function ParticipantDetailPage() {
                           title={m.name}
                         />
                       ))}
-                    </Stack>
+                    </ListGroup>
                   ) : (
                     <Text size="sm" c="dimmed">
                       Belum ada mentee
@@ -471,7 +472,7 @@ export function ParticipantDetailPage() {
               )}
               {p.isCoordinator && (
                 <Section title="Mentor binaan">
-                  <Stack gap="xs">
+                  <ListGroup>
                     {d.mentors.map((m) => (
                       <LinkRow
                         key={m.userId}
@@ -479,7 +480,7 @@ export function ParticipantDetailPage() {
                         title={m.name}
                       />
                     ))}
-                  </Stack>
+                  </ListGroup>
                 </Section>
               )}
               {p.isMentee && (
