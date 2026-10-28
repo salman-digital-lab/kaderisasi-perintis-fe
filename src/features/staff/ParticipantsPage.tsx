@@ -1,10 +1,20 @@
-import { ActionIcon, Chip, Group, Stack, Text, TextInput } from "@mantine/core";
+import {
+  ActionIcon,
+  Anchor,
+  Chip,
+  Group,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconFileImport, IconSearch } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { staffApi } from "@/api/endpoints";
+import type { ParticipantRow } from "@/api/types";
+import { DataTable, useDesktop, type Column } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import {
   Avatarish,
@@ -16,7 +26,85 @@ import {
 } from "@/components/ui";
 import { PARTICIPANT_STATUS, ROLE_LABEL } from "@/content/labels";
 
+function Badges({ r }: { r: ParticipantRow }) {
+  return (
+    <Group gap={6}>
+      <StatusBadge {...PARTICIPANT_STATUS[r.status]} />
+      {!r.hasAccount && (
+        <StatusBadge label="Akun belum aktif" tone="gray" variant="outline" />
+      )}
+      {r.roles.includes("mentee") && !r.clubOk && (
+        <StatusBadge label="Belum ada club" tone="orange" variant="outline" />
+      )}
+    </Group>
+  );
+}
+
+const COLUMNS: Column<ParticipantRow>[] = [
+  {
+    key: "name",
+    header: "Nama",
+    sortValue: (r) => r.name,
+    render: (r) => (
+      <Group gap="sm" wrap="nowrap">
+        <Avatarish name={r.name} size={34} />
+        <div style={{ minWidth: 0 }}>
+          <Anchor
+            component={Link}
+            to={`/kelola/peserta/${r.userId}`}
+            fw={700}
+            c="inherit"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {r.name}
+          </Anchor>
+          <Text size="xs" c="dimmed" truncate>
+            {r.email}
+          </Text>
+        </div>
+      </Group>
+    ),
+  },
+  {
+    key: "roles",
+    header: "Peran",
+    sortValue: (r) => r.roles.map((x) => ROLE_LABEL[x]).join(" + "),
+    render: (r) => r.roles.map((x) => ROLE_LABEL[x]).join(" + "),
+  },
+  {
+    key: "nim",
+    header: "NIM",
+    sortValue: (r) => r.nim ?? "",
+    render: (r) => r.nim ?? "—",
+  },
+  {
+    key: "group",
+    header: "Mentor / kelompok",
+    sortValue: (r) => r.mentorName ?? "",
+    render: (r) =>
+      [
+        r.roles.includes("mentee") ? `Mentor ${r.mentorName ?? "—"}` : "",
+        r.roles.includes("mentor") ? `${r.menteeCount} mentee` : "",
+      ]
+        .filter(Boolean)
+        .join(" · ") || "—",
+  },
+  {
+    key: "coordinator",
+    header: "Koordinator",
+    sortValue: (r) => r.coordinatorName ?? "",
+    render: (r) => r.coordinatorName ?? "—",
+  },
+  {
+    key: "status",
+    header: "Status",
+    sortValue: (r) => PARTICIPANT_STATUS[r.status].label,
+    render: (r) => <Badges r={r} />,
+  },
+];
+
 export function ParticipantsPage() {
+  const desktop = useDesktop();
   const [params, setParams] = useSearchParams();
   const role = params.get("role") ?? "";
   const status = params.get("status") ?? "";
@@ -52,6 +140,7 @@ export function ParticipantsPage() {
     >
       <Stack gap="sm">
         <TextInput
+          maw={desktop ? 420 : undefined}
           type="search"
           enterKeyHint="search"
           autoCapitalize="none"
@@ -103,47 +192,40 @@ export function ParticipantsPage() {
                 <Text size="xs" c="dimmed" px={4}>
                   {rows.length} peserta
                 </Text>
-                <ListGroup>
-                  {rows.map((r) => (
-                    <LinkRow
-                      key={r.userId}
-                      to={`/kelola/peserta/${r.userId}`}
-                      icon={<Avatarish name={r.name} />}
-                      title={r.name}
-                      description={
-                        <Stack gap={4}>
-                          <Text size="xs" c="dimmed" lineClamp={1}>
-                            {r.roles.map((x) => ROLE_LABEL[x]).join(" + ")}
-                            {r.nim ? ` · ${r.nim}` : ""}
-                            {r.roles.includes("mentee")
-                              ? ` · mentor ${r.mentorName ?? "—"}`
-                              : ""}
-                            {r.roles.includes("mentor")
-                              ? ` · ${r.menteeCount} mentee`
-                              : ""}
-                          </Text>
-                          <Group gap={6}>
-                            <StatusBadge {...PARTICIPANT_STATUS[r.status]} />
-                            {!r.hasAccount && (
-                              <StatusBadge
-                                label="Akun belum aktif"
-                                tone="gray"
-                                variant="outline"
-                              />
-                            )}
-                            {r.roles.includes("mentee") && !r.clubOk && (
-                              <StatusBadge
-                                label="Belum ada club"
-                                tone="orange"
-                                variant="outline"
-                              />
-                            )}
-                          </Group>
-                        </Stack>
-                      }
-                    />
-                  ))}
-                </ListGroup>
+                {desktop ? (
+                  <DataTable
+                    columns={COLUMNS}
+                    rows={rows}
+                    rowKey={(r) => r.userId}
+                    rowHref={(r) => `/kelola/peserta/${r.userId}`}
+                  />
+                ) : (
+                  <ListGroup>
+                    {rows.map((r) => (
+                      <LinkRow
+                        key={r.userId}
+                        to={`/kelola/peserta/${r.userId}`}
+                        icon={<Avatarish name={r.name} />}
+                        title={r.name}
+                        description={
+                          <Stack gap={4}>
+                            <Text size="xs" c="dimmed" lineClamp={1}>
+                              {r.roles.map((x) => ROLE_LABEL[x]).join(" + ")}
+                              {r.nim ? ` · ${r.nim}` : ""}
+                              {r.roles.includes("mentee")
+                                ? ` · mentor ${r.mentorName ?? "—"}`
+                                : ""}
+                              {r.roles.includes("mentor")
+                                ? ` · ${r.menteeCount} mentee`
+                                : ""}
+                            </Text>
+                            <Badges r={r} />
+                          </Stack>
+                        }
+                      />
+                    ))}
+                  </ListGroup>
+                )}
               </Stack>
             ) : (
               <EmptyState

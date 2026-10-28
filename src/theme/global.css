@@ -158,3 +158,17 @@ body {
     min-height: 28rem;
   }
 }
+
+/* Side column that stays in view next to long desktop content. */
+@media (min-width: $mantine-breakpoint-md) {
+  .stickyAside {
+    position: sticky;
+    top: calc(4.25rem + var(--mantine-spacing-lg));
+  }
+}
+
+/* Table cells kept on one line, buttons included (the theme lets button labels wrap). */
+.nowrapCell,
+.nowrapCell .mantine-Button-label {
+  white-space: nowrap;
+}

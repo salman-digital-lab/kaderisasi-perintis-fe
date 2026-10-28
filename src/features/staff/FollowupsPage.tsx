@@ -4,6 +4,7 @@ import {
   Anchor,
   Button,
   Chip,
+  Flex,
   Group,
   Modal,
   Paper,
@@ -19,6 +20,7 @@ import { Link } from "react-router";
 import { staffApi } from "@/api/endpoints";
 import { errorMessage } from "@/api/errors";
 import type { FollowupItem } from "@/api/types";
+import { DataTable, useDesktop, type Column } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import {
   EmptyState,
@@ -89,6 +91,87 @@ export function FollowupsPage() {
   const [status, setStatus] = useState("open");
   const [source, setSource] = useState("");
   const [active, setActive] = useState<FollowupItem | null>(null);
+  const desktop = useDesktop();
+  const columns: Column<FollowupItem>[] = [
+    {
+      key: "source",
+      header: "Jenis",
+      nowrap: true,
+      sortValue: (f) => SOURCE[f.source].label,
+      render: (f) => <StatusBadge {...SOURCE[f.source]} />,
+    },
+    {
+      key: "subject",
+      header: "Peserta",
+      width: "24%",
+      sortValue: (f) => f.subject,
+      render: (f) => (
+        <>
+          <Text fw={700} size="sm">
+            {f.subject}
+          </Text>
+          <Text size="xs" c="dimmed">
+            Mentor {f.mentorName ?? "—"} · Koordinator{" "}
+            {f.coordinatorName ?? "—"}
+          </Text>
+        </>
+      ),
+    },
+    {
+      key: "month",
+      header: "Bulan",
+      nowrap: true,
+      sortValue: (f) => f.month,
+      render: (f) => monthShort(f.month),
+    },
+    {
+      key: "opened",
+      header: "Terbuka",
+      nowrap: true,
+      sortValue: (f) => f.openedAt,
+      render: (f) => (f.status === "open" ? ageLabel(f.openedAt) : "Ditangani"),
+    },
+    {
+      key: "detail",
+      header: "Keterangan",
+      render: (f) => (
+        <>
+          <Text size="sm" lineClamp={3} title={f.detail}>
+            {f.detail}
+          </Text>
+          {f.handled && (
+            <Text size="xs" c="dimmed" mt={4} lineClamp={2}>
+              {f.handled.by} · {fmtDateTime(f.handled.at)}: {f.handled.note}
+            </Text>
+          )}
+        </>
+      ),
+    },
+    {
+      key: "actions",
+      header: "",
+      nowrap: true,
+      render: (f) => (
+        <Group gap="xs" wrap="nowrap" justify="flex-end">
+          {f.source !== "report" && (
+            <Button
+              size="xs"
+              variant="default"
+              component={Link}
+              to={`/kelola/lapbul/${f.id}`}
+            >
+              Buka lapbul
+            </Button>
+          )}
+          {f.status === "open" && (
+            <Button size="xs" variant="light" onClick={() => setActive(f)}>
+              Tandai ditangani
+            </Button>
+          )}
+        </Group>
+      ),
+    },
+  ];
   const query = useQuery({
     queryKey: ["staff", "followups", { status, source }],
     queryFn: () => staffApi.followups({ status, source }),
@@ -101,35 +184,46 @@ export function FollowupsPage() {
       subtitle="Paling lama terbuka di atas"
     >
       <Stack gap="lg">
-        <Chip.Group value={status} onChange={(v) => setStatus(v as string)}>
-          <Group gap={6}>
-            <Chip value="open" size="sm">
-              Terbuka
-            </Chip>
-            <Chip value="handled" size="sm">
-              Ditangani
-            </Chip>
-          </Group>
-        </Chip.Group>
-        <Chip.Group value={source} onChange={(v) => setSource(v as string)}>
-          <Group gap={6} wrap="nowrap" className="hscroll">
-            <Chip value="" size="sm">
-              Semua
-            </Chip>
-            <Chip value="journal" size="sm">
-              Lapbul
-            </Chip>
-            <Chip value="flag" size="sm">
-              Bendera
-            </Chip>
-            <Chip value="report" size="sm">
-              Kasus
-            </Chip>
-          </Group>
-        </Chip.Group>
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          gap={{ base: "lg", md: "xl" }}
+        >
+          <Chip.Group value={status} onChange={(v) => setStatus(v as string)}>
+            <Group gap={6}>
+              <Chip value="open" size="sm">
+                Terbuka
+              </Chip>
+              <Chip value="handled" size="sm">
+                Ditangani
+              </Chip>
+            </Group>
+          </Chip.Group>
+          <Chip.Group value={source} onChange={(v) => setSource(v as string)}>
+            <Group gap={6} wrap="nowrap" className="hscroll">
+              <Chip value="" size="sm">
+                Semua
+              </Chip>
+              <Chip value="journal" size="sm">
+                Lapbul
+              </Chip>
+              <Chip value="flag" size="sm">
+                Bendera
+              </Chip>
+              <Chip value="report" size="sm">
+                Kasus
+              </Chip>
+            </Group>
+          </Chip.Group>
+        </Flex>
         <Loadable query={query}>
           {(items) =>
-            items.length ? (
+            items.length && desktop ? (
+              <DataTable
+                columns={columns}
+                rows={items}
+                rowKey={(f) => `${f.source}-${f.id}`}
+              />
+            ) : items.length ? (
               <Stack gap="sm">
                 {items.map((f) => (
                   <Paper key={`${f.source}-${f.id}`} p="md">

@@ -2,6 +2,7 @@ import {
   Alert,
   Button,
   FileButton,
+  Grid,
   Group,
   Paper,
   SegmentedControl,
@@ -16,7 +17,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { staffApi } from "@/api/endpoints";
 import { errorMessage } from "@/api/errors";
-import type { ImportKind, ImportPreview } from "@/api/types";
+import type { ImportKind, ImportPreview, ImportPreviewRow } from "@/api/types";
+import { DataTable, useDesktop, type Column } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import { StatusBadge } from "@/components/ui";
 import { downloadCsv } from "@/lib/files";
@@ -52,7 +54,41 @@ const RESULT = {
   error: { label: "Galat", tone: "red" },
 } as const;
 
+const PREVIEW_COLUMNS: Column<ImportPreviewRow>[] = [
+  {
+    key: "line",
+    header: "Baris",
+    sortValue: (r) => r.line,
+    render: (r) => r.line,
+  },
+  {
+    key: "values",
+    header: "Data",
+    render: (r) => (
+      <Text size="sm" fw={600} lineClamp={2}>
+        {r.values.join(" · ")}
+      </Text>
+    ),
+  },
+  {
+    key: "result",
+    header: "Hasil",
+    sortValue: (r) => RESULT[r.result].label,
+    render: (r) => <StatusBadge {...RESULT[r.result]} />,
+  },
+  {
+    key: "message",
+    header: "Keterangan",
+    render: (r) => (
+      <Text size="xs" c={r.result === "error" ? "red.8" : "dimmed"}>
+        {r.message}
+      </Text>
+    ),
+  },
+];
+
 export function ImportPage() {
+  const desktop = useDesktop();
   const queryClient = useQueryClient();
   const [kind, setKind] = useState<ImportKind>("mentee");
   const [csv, setCsv] = useState(TEMPLATES.mentee.csv);
@@ -90,135 +126,163 @@ export function ImportPage() {
       title="Impor peserta"
       subtitle="Pratinjau dulu, lalu terapkan"
       back="/kelola/peserta"
+      width="wide"
     >
-      <Stack gap="lg">
-        <SegmentedControl
-          fullWidth
-          value={kind}
-          onChange={(v) => {
-            const k = v as ImportKind;
-            setKind(k);
-            setCsv(TEMPLATES[k].csv);
-            setPreview(null);
-          }}
-          data={(Object.keys(TEMPLATES) as ImportKind[]).map((k) => ({
-            value: k,
-            label: TEMPLATES[k].label,
-          }))}
-        />
-        <Paper p="lg">
-          <Title order={3}>1. Templat</Title>
-          <Text size="sm" c="dimmed" mb="sm">
-            Kolom tetap: <code>{TEMPLATES[kind].csv.split("\n")[0]}</code>
-          </Text>
-          <Button
-            variant="light"
-            leftSection={<IconDownload size={18} />}
-            onClick={() =>
-              downloadCsv(
-                `templat-${kind}.csv`,
-                TEMPLATES[kind].csv.split("\n")[0] + "\n",
-              )
-            }
-          >
-            Unduh templat
-          </Button>
-        </Paper>
-        <Paper p="lg">
-          <Title order={3}>2. Isi berkas</Title>
-          <Text size="sm" c="dimmed" mb="sm">
-            Unggah CSV atau tempel isinya. Contoh sudah terisi agar bisa
-            langsung dicoba.
-          </Text>
-          <Stack gap="sm">
-            <FileButton
-              accept=".csv,text/csv"
-              onChange={async (file) => {
-                if (!file) return;
-                setCsv(await file.text());
+      <Grid gap="lg">
+        <Grid.Col span={{ base: 12, md: 5 }}>
+          <Stack gap="lg">
+            <SegmentedControl
+              fullWidth
+              value={kind}
+              onChange={(v) => {
+                const k = v as ImportKind;
+                setKind(k);
+                setCsv(TEMPLATES[k].csv);
                 setPreview(null);
               }}
-            >
-              {(props) => (
-                <Button
-                  {...props}
-                  variant="default"
-                  leftSection={<IconUpload size={18} />}
-                >
-                  Pilih berkas CSV
-                </Button>
-              )}
-            </FileButton>
-            <Textarea
-              aria-label="Isi CSV"
-              minRows={5}
-              ff="monospace"
-              value={csv}
-              onChange={(e) => {
-                setCsv(e.currentTarget.value);
-                setPreview(null);
-              }}
+              data={(Object.keys(TEMPLATES) as ImportKind[]).map((k) => ({
+                value: k,
+                label: TEMPLATES[k].label,
+              }))}
             />
-            <Button
-              leftSection={<IconEye size={18} />}
-              loading={doPreview.isPending}
-              onClick={() => doPreview.mutate()}
-            >
-              Pratinjau (tidak menulis apa pun)
-            </Button>
-          </Stack>
-        </Paper>
-        {preview && (
-          <Paper p="lg">
-            <Title order={3}>3. Pratinjau</Title>
-            <Group gap={6} my="sm">
-              {(Object.keys(RESULT) as (keyof typeof RESULT)[]).map((k) =>
-                counts?.[k] ? (
-                  <StatusBadge
-                    key={k}
-                    label={`${RESULT[k].label} ${counts[k]}`}
-                    tone={RESULT[k].tone}
-                  />
-                ) : null,
-              )}
-            </Group>
-            <Stack gap="xs">
-              {preview.rows.map((r) => (
-                <Paper key={r.line} p="sm" bg="var(--surface-subtle)">
-                  <Group justify="space-between" wrap="nowrap" mb={2}>
-                    <Text size="xs" c="dimmed">
-                      Baris {r.line}
-                    </Text>
-                    <StatusBadge {...RESULT[r.result]} />
-                  </Group>
-                  <Text size="sm" fw={600} truncate>
-                    {r.values.join(" · ")}
-                  </Text>
-                  <Text size="xs" c={r.result === "error" ? "red.8" : "dimmed"}>
-                    {r.message}
-                  </Text>
-                </Paper>
-              ))}
-            </Stack>
-            {preview.canApply ? (
+            <Paper p="lg">
+              <Title order={3}>1. Templat</Title>
+              <Text size="sm" c="dimmed" mb="sm">
+                Kolom tetap: <code>{TEMPLATES[kind].csv.split("\n")[0]}</code>
+              </Text>
               <Button
-                mt="md"
-                fullWidth
-                color="teal"
-                loading={apply.isPending}
-                onClick={() => apply.mutate()}
+                variant="light"
+                leftSection={<IconDownload size={18} />}
+                onClick={() =>
+                  downloadCsv(
+                    `templat-${kind}.csv`,
+                    TEMPLATES[kind].csv.split("\n")[0] + "\n",
+                  )
+                }
               >
-                Terapkan {preview.rows.length} baris
+                Unduh templat
               </Button>
+            </Paper>
+            <Paper p="lg">
+              <Title order={3}>2. Isi berkas</Title>
+              <Text size="sm" c="dimmed" mb="sm">
+                Unggah CSV atau tempel isinya. Contoh sudah terisi agar bisa
+                langsung dicoba.
+              </Text>
+              <Stack gap="sm">
+                <FileButton
+                  accept=".csv,text/csv"
+                  onChange={async (file) => {
+                    if (!file) return;
+                    setCsv(await file.text());
+                    setPreview(null);
+                  }}
+                >
+                  {(props) => (
+                    <Button
+                      {...props}
+                      variant="default"
+                      leftSection={<IconUpload size={18} />}
+                    >
+                      Pilih berkas CSV
+                    </Button>
+                  )}
+                </FileButton>
+                <Textarea
+                  aria-label="Isi CSV"
+                  minRows={5}
+                  ff="monospace"
+                  value={csv}
+                  onChange={(e) => {
+                    setCsv(e.currentTarget.value);
+                    setPreview(null);
+                  }}
+                />
+                <Button
+                  leftSection={<IconEye size={18} />}
+                  loading={doPreview.isPending}
+                  onClick={() => doPreview.mutate()}
+                >
+                  Pratinjau (tidak menulis apa pun)
+                </Button>
+              </Stack>
+            </Paper>
+          </Stack>
+        </Grid.Col>
+        {(preview || desktop) && (
+          <Grid.Col span={{ base: 12, md: 7 }}>
+            {preview ? (
+              <Paper p="lg">
+                <Title order={3}>3. Pratinjau</Title>
+                <Group gap={6} my="sm">
+                  {(Object.keys(RESULT) as (keyof typeof RESULT)[]).map((k) =>
+                    counts?.[k] ? (
+                      <StatusBadge
+                        key={k}
+                        label={`${RESULT[k].label} ${counts[k]}`}
+                        tone={RESULT[k].tone}
+                      />
+                    ) : null,
+                  )}
+                </Group>
+                {desktop ? (
+                  <DataTable
+                    columns={PREVIEW_COLUMNS}
+                    rows={preview.rows}
+                    rowKey={(r) => r.line}
+                    minWidth={0}
+                  />
+                ) : (
+                  <Stack gap="xs">
+                    {preview.rows.map((r) => (
+                      <Paper key={r.line} p="sm" bg="var(--surface-subtle)">
+                        <Group justify="space-between" wrap="nowrap" mb={2}>
+                          <Text size="xs" c="dimmed">
+                            Baris {r.line}
+                          </Text>
+                          <StatusBadge {...RESULT[r.result]} />
+                        </Group>
+                        <Text size="sm" fw={600} truncate>
+                          {r.values.join(" · ")}
+                        </Text>
+                        <Text
+                          size="xs"
+                          c={r.result === "error" ? "red.8" : "dimmed"}
+                        >
+                          {r.message}
+                        </Text>
+                      </Paper>
+                    ))}
+                  </Stack>
+                )}
+                {preview.canApply ? (
+                  <Button
+                    mt="md"
+                    fullWidth
+                    color="teal"
+                    loading={apply.isPending}
+                    onClick={() => apply.mutate()}
+                  >
+                    Terapkan {preview.rows.length} baris
+                  </Button>
+                ) : (
+                  <Alert color="red" variant="light" mt="md">
+                    Masih ada baris galat. Perbaiki berkas lalu pratinjau ulang;
+                    tidak ada yang ditulis.
+                  </Alert>
+                )}
+              </Paper>
             ) : (
-              <Alert color="red" variant="light" mt="md">
-                Masih ada baris galat. Perbaiki berkas lalu pratinjau ulang;
-                tidak ada yang ditulis.
-              </Alert>
+              <Paper p="lg">
+                <Title order={3}>3. Pratinjau</Title>
+                <Text size="sm" c="dimmed" mt="xs">
+                  Hasil pratinjau tampil di sini. Belum ada yang ditulis.
+                </Text>
+              </Paper>
             )}
-          </Paper>
+          </Grid.Col>
         )}
-      </Stack>
+      </Grid>
     </Screen>
   );
 }

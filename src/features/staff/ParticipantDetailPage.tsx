@@ -2,6 +2,7 @@ import {
   Alert,
   Button,
   Checkbox,
+  Grid,
   Group,
   Modal,
   Paper,
@@ -31,6 +32,7 @@ import type {
   ParticipantStatus,
   UpdateParticipantInput,
 } from "@/api/types";
+import { useDesktop } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import {
   Avatarish,
@@ -349,18 +351,20 @@ export function ParticipantDetailPage() {
     queryFn: () => staffApi.participant(id),
   });
   const close = () => setModal(null);
+  const desktop = useDesktop();
 
   return (
     <Screen
       title={query.data?.profile.name ?? "Peserta"}
       subtitle="Data peserta"
       back="/kelola/peserta"
+      width="wide"
     >
       <Loadable query={query}>
         {(d) => {
           const p = d.participant;
-          return (
-            <Stack gap="lg">
+          const identity = (
+            <>
               <Paper p="lg">
                 <Group wrap="nowrap" align="flex-start">
                   <Avatarish name={d.profile.name} size={52} />
@@ -391,6 +395,10 @@ export function ParticipantDetailPage() {
                   </Text>
                 )}
               </Paper>
+            </>
+          );
+          const actions = (
+            <>
               <Group grow gap="xs">
                 <Button
                   variant="light"
@@ -422,6 +430,10 @@ export function ParticipantDetailPage() {
                   Status
                 </Button>
               </Group>
+            </>
+          );
+          const menteeData = (
+            <>
               {p.isMentee && (
                 <Section title="Mentee">
                   <KeyValue
@@ -449,6 +461,10 @@ export function ParticipantDetailPage() {
                   />
                 </Section>
               )}
+            </>
+          );
+          const groups = (
+            <>
               {p.isMentor && (
                 <Section
                   title="Mentor & kelompok"
@@ -485,6 +501,10 @@ export function ParticipantDetailPage() {
                   </ListGroup>
                 </Section>
               )}
+            </>
+          );
+          const journals = (
+            <>
               {p.isMentee && (
                 <Section title="Catatan Perjalanan">
                   <Stack gap={0} className="qa">
@@ -526,6 +546,36 @@ export function ParticipantDetailPage() {
                   </Stack>
                 </Section>
               )}
+            </>
+          );
+          return (
+            <>
+              {desktop ? (
+                <Grid gap="lg">
+                  <Grid.Col span={4}>
+                    <Stack gap="lg">
+                      {identity}
+                      {actions}
+                      {p.isMentee && groups}
+                    </Stack>
+                  </Grid.Col>
+                  <Grid.Col span={8}>
+                    <Stack gap="lg">
+                      {menteeData}
+                      {!p.isMentee && groups}
+                      {journals}
+                    </Stack>
+                  </Grid.Col>
+                </Grid>
+              ) : (
+                <Stack gap="lg">
+                  {identity}
+                  {actions}
+                  {menteeData}
+                  {groups}
+                  {journals}
+                </Stack>
+              )}
               <Modal
                 opened={modal === "edit"}
                 onClose={close}
@@ -550,7 +600,7 @@ export function ParticipantDetailPage() {
               >
                 <StatusModal detail={d} onClose={close} />
               </Modal>
-            </Stack>
+            </>
           );
         }}
       </Loadable>
