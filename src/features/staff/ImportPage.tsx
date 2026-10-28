@@ -91,7 +91,7 @@ export function ImportPage() {
       subtitle="Pratinjau dulu, lalu terapkan"
       back="/kelola/peserta"
     >
-      <Stack gap="md">
+      <Stack gap="lg">
         <SegmentedControl
           fullWidth
           value={kind}
@@ -106,7 +106,7 @@ export function ImportPage() {
             label: TEMPLATES[k].label,
           }))}
         />
-        <Paper p="md">
+        <Paper p="lg">
           <Title order={3}>1. Templat</Title>
           <Text size="sm" c="dimmed" mb="sm">
             Kolom tetap: <code>{TEMPLATES[kind].csv.split("\n")[0]}</code>
@@ -124,7 +124,7 @@ export function ImportPage() {
             Unduh templat
           </Button>
         </Paper>
-        <Paper p="md">
+        <Paper p="lg">
           <Title order={3}>2. Isi berkas</Title>
           <Text size="sm" c="dimmed" mb="sm">
             Unggah CSV atau tempel isinya. Contoh sudah terisi agar bisa
@@ -169,7 +169,7 @@ export function ImportPage() {
           </Stack>
         </Paper>
         {preview && (
-          <Paper p="md">
+          <Paper p="lg">
             <Title order={3}>3. Pratinjau</Title>
             <Group gap={6} my="sm">
               {(Object.keys(RESULT) as (keyof typeof RESULT)[]).map((k) =>

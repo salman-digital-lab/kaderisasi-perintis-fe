@@ -8,7 +8,6 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  Title,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import {
@@ -25,7 +24,7 @@ import { errorMessage } from "@/api/errors";
 import type { ExportKind } from "@/api/types";
 import { DisplayTitle } from "@/components/brand";
 import { Screen } from "@/components/layout/Screen";
-import { EmptyState, Loadable, Section } from "@/components/ui";
+import { EmptyState, Loadable, PageSection, Section } from "@/components/ui";
 import { downloadCsv } from "@/lib/files";
 import { currentReportMonth, monthLabel, reportMonths } from "@/lib/time";
 
@@ -104,7 +103,7 @@ export function StaffDashboardPage() {
         </Stack>
       }
     >
-      <Stack gap="md">
+      <Stack gap="lg">
         <Paper p="lg" radius="lg" withBorder={false} className="raised">
           <NativeSelect
             aria-label="Bulan laporan"
@@ -151,7 +150,7 @@ export function StaffDashboardPage() {
                 title="Indikator"
                 description={`Bab 5.2 · ${monthLabel(d.month)}`}
               >
-                <Stack gap="md">
+                <Stack gap="lg">
                   {d.indicators.map((i) => {
                     const value = pct(i.numerator, i.denominator);
                     const ok =
@@ -189,51 +188,52 @@ export function StaffDashboardPage() {
                   </Text>
                 </Stack>
               </Section>
-              <Title order={3}>Per koordinator</Title>
-              <Stack gap="xs">
-                {d.byCoordinator.map((c) => (
-                  <Paper key={c.coordinator.userId} p="md">
-                    <Group justify="space-between" mb="xs" wrap="nowrap">
-                      <Text fw={700}>{c.coordinator.name}</Text>
-                      <Text size="xs" c="dimmed">
-                        {c.mentors} mentor · {c.mentees} mentee
-                      </Text>
-                    </Group>
-                    <SimpleGrid cols={2} spacing={6} verticalSpacing={4}>
-                      <Text size="sm">
-                        Lapbul terkirim{" "}
-                        <b>
-                          {c.submitted}/{c.mentees}
-                        </b>
-                      </Text>
-                      <Text size="sm">
-                        Terlambat <b>{c.late}</b>
-                      </Text>
-                      <Text size="sm">
-                        Ditanggapi{" "}
-                        <b>
-                          {c.responded}/{c.submitted}
-                        </b>
-                      </Text>
-                      <Text size="sm" c={c.activeFlags ? "red.8" : undefined}>
-                        Bendera aktif <b>{c.activeFlags}</b>
-                      </Text>
-                      <Text size="sm">
-                        Laporan diajukan{" "}
-                        <b>
-                          {c.reportsSubmitted}/{c.mentors}
-                        </b>
-                      </Text>
-                      <Text size="sm">
-                        Diverifikasi{" "}
-                        <b>
-                          {c.reportsVerified}/{c.mentors}
-                        </b>
-                      </Text>
-                    </SimpleGrid>
-                  </Paper>
-                ))}
-              </Stack>
+              <PageSection title="Per koordinator">
+                <Stack gap="sm">
+                  {d.byCoordinator.map((c) => (
+                    <Paper key={c.coordinator.userId} p="lg">
+                      <Group justify="space-between" mb="xs" wrap="nowrap">
+                        <Text fw={700}>{c.coordinator.name}</Text>
+                        <Text size="xs" c="dimmed">
+                          {c.mentors} mentor · {c.mentees} mentee
+                        </Text>
+                      </Group>
+                      <SimpleGrid cols={2} spacing={6} verticalSpacing={4}>
+                        <Text size="sm">
+                          Lapbul terkirim{" "}
+                          <b>
+                            {c.submitted}/{c.mentees}
+                          </b>
+                        </Text>
+                        <Text size="sm">
+                          Terlambat <b>{c.late}</b>
+                        </Text>
+                        <Text size="sm">
+                          Ditanggapi{" "}
+                          <b>
+                            {c.responded}/{c.submitted}
+                          </b>
+                        </Text>
+                        <Text size="sm" c={c.activeFlags ? "red.8" : undefined}>
+                          Bendera aktif <b>{c.activeFlags}</b>
+                        </Text>
+                        <Text size="sm">
+                          Laporan diajukan{" "}
+                          <b>
+                            {c.reportsSubmitted}/{c.mentors}
+                          </b>
+                        </Text>
+                        <Text size="sm">
+                          Diverifikasi{" "}
+                          <b>
+                            {c.reportsVerified}/{c.mentors}
+                          </b>
+                        </Text>
+                      </SimpleGrid>
+                    </Paper>
+                  ))}
+                </Stack>
+              </PageSection>
               <Section
                 title="Ekspor CSV"
                 description="Kolom tetap; data sensitif tidak ikut. Angka sama dengan layar."

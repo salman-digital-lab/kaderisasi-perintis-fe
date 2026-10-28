@@ -28,6 +28,7 @@ import {
   ListGroup,
   Loadable,
   Note,
+  PageSection,
   StatusBadge,
 } from "@/components/ui";
 import {
@@ -127,7 +128,7 @@ export function GroupDashboardPage() {
         </Stack>
       }
     >
-      <Stack gap="md">
+      <Stack gap="lg">
         <Paper p="lg" radius="lg" withBorder={false} className="raised">
           <NativeSelect
             aria-label="Bulan laporan"
@@ -165,10 +166,7 @@ export function GroupDashboardPage() {
                 {flags.map((r) => (
                   <FlagBox key={r.mentee.userId} row={r} />
                 ))}
-                <div>
-                  <Title order={3} mb="xs">
-                    Mentee
-                  </Title>
+                <PageSection title="Mentee">
                   {d.rows.length ? (
                     <ListGroup>
                       {d.rows.map((r) => {
@@ -220,7 +218,7 @@ export function GroupDashboardPage() {
                       description="Pengelola akan menetapkan mentee ke kelompokmu."
                     />
                   )}
-                </div>
+                </PageSection>
                 <Note>
                   Lapbul yang sudah terkirim bisa dibuka untuk ditanggapi.
                   Mentee yang belum mengisi membuka profilnya.

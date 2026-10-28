@@ -28,9 +28,9 @@ function Block({
   children: ReactNode;
 }) {
   return (
-    <Paper p="md">
-      <Group justify="space-between" mb="xs" wrap="nowrap">
-        <Title order={4}>{title}</Title>
+    <Paper p="lg">
+      <Group justify="space-between" mb="md" wrap="nowrap">
+        <Title order={3}>{title}</Title>
         {sensitive && showSensitive && (
           <Badge
             color="grape"
@@ -43,7 +43,9 @@ function Block({
           </Badge>
         )}
       </Group>
-      <Stack gap="sm">{children}</Stack>
+      <Stack gap={0} className="qa">
+        {children}
+      </Stack>
     </Paper>
   );
 }
@@ -51,7 +53,7 @@ function Block({
 function Item({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <Text size="xs" fw={700} c="dimmed" mb={2}>
+      <Text size="xs" fw={700} c="dimmed" mb={6}>
         {label}
       </Text>
       {typeof children === "string" || children == null ? (

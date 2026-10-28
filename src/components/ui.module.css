@@ -1,13 +1,24 @@
+/* Label/value rows split by hairlines so each pair reads as one unit. */
 .kv {
   margin: 0;
   display: grid;
-  gap: 0.5rem;
 }
 .kvRow {
   display: grid;
-  grid-template-columns: minmax(6.5rem, 38%) 1fr;
-  gap: 0.75rem;
+  grid-template-columns: minmax(7.5rem, 42%) 1fr;
+  gap: 1rem;
+  padding-block: 0.625rem;
   font-size: var(--mantine-font-size-sm);
+  line-height: 1.45;
+}
+.kvRow + .kvRow {
+  border-top: 1px solid var(--surface-border);
+}
+.kvRow:first-child {
+  padding-top: 0;
+}
+.kvRow:last-child {
+  padding-bottom: 0;
 }
 .kvRow dt {
   color: var(--mantine-color-dimmed);
@@ -21,7 +32,7 @@
 .rowButton {
   display: block;
   width: 100%;
-  padding: 0.875rem var(--mantine-spacing-md);
+  padding: 1rem var(--mantine-spacing-md);
   border-radius: var(--mantine-radius-md);
   border: 1px solid var(--surface-border);
   background: #ffffff;
@@ -169,4 +180,9 @@
   border: 1px solid var(--surface-border);
   border-radius: var(--mantine-radius-md);
   background: #ffffff;
+}
+
+/* Extra air above a titled group on the page background. */
+.pageSection {
+  margin-top: var(--mantine-spacing-sm);
 }

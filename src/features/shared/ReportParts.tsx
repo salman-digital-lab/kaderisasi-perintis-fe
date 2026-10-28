@@ -28,7 +28,7 @@ import { FileList } from "./JournalContent";
 
 export function TasksChecklist({ tasks }: { tasks: MentorTasks }) {
   return (
-    <Paper p="md">
+    <Paper p="lg">
       <Title order={3} mb="sm">
         Tugas mentor bulan ini
       </Title>
@@ -139,13 +139,13 @@ export function ReviewCard({
           : ""}{" "}
         · {fmtDateTime(r.reviewedAt)}
       </Text>
-      <Text size="xs" fw={700} c="dimmed">
+      <Text size="xs" fw={700} c="dimmed" mb={4}>
         Apresiasi
       </Text>
       <MultilineText size="sm" mb="xs">
         {r.appreciation}
       </MultilineText>
-      <Text size="xs" fw={700} c="dimmed">
+      <Text size="xs" fw={700} c="dimmed" mb={4}>
         Catatan
       </Text>
       <MultilineText size="sm">{r.note}</MultilineText>
@@ -156,7 +156,7 @@ export function ReviewCard({
 export function ReportSummary({ detail }: { detail: ReportDetail }) {
   const r = detail.report!;
   return (
-    <Paper p="md">
+    <Paper p="lg">
       <Title order={3} mb="sm">
         Berita acara sesi
       </Title>

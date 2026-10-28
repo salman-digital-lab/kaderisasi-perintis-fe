@@ -6,7 +6,6 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  Title,
   Tooltip,
 } from "@mantine/core";
 import {
@@ -27,6 +26,7 @@ import {
   LinkRow,
   ListGroup,
   Loadable,
+  PageSection,
   StatusBadge,
 } from "@/components/ui";
 import { REPORT_STATUS, TASK_LABEL } from "@/content/labels";
@@ -115,7 +115,7 @@ export function CoordinatorPanelPage() {
         </Stack>
       }
     >
-      <Stack gap="md">
+      <Stack gap="lg">
         <Paper p="lg" radius="lg" withBorder={false} className="raised">
           <NativeSelect
             aria-label="Bulan laporan"
@@ -167,67 +167,71 @@ export function CoordinatorPanelPage() {
                     tone={escalated ? "red.8" : undefined}
                   />
                 </SimpleGrid>
-                <Title order={3}>Mentor binaan</Title>
-                {sorted.length ? (
-                  <ListGroup>
-                    {sorted.map((r) => (
-                      <LinkRow
-                        key={r.mentor.userId}
-                        to={`/koordinator/laporan/${r.mentor.userId}/${month}`}
-                        title={r.mentor.name}
-                        description={
-                          <Stack gap={6}>
-                            <Text size="xs" c="dimmed">
-                              {r.menteeCount} mentee · tingkat {r.tingkat} ·
-                              lapbul {r.journals.submitted} terkirim,{" "}
-                              {r.journals.responded} ditanggapi
-                              {r.journals.late
-                                ? `, ${r.journals.late} terlambat`
-                                : ""}
-                            </Text>
-                            <Group gap={6}>
-                              <StatusBadge
-                                {...REPORT_STATUS[
-                                  r.report?.status ?? "not_started"
-                                ]}
-                              />
-                              {r.report?.isLate && (
-                                <StatusBadge label="Terlambat" tone="orange" />
-                              )}
-                              {r.report?.hasCase && (
-                                <Group gap={2} c="orange.8">
-                                  <IconShieldLock size={14} />
-                                  <Text size="xs" fw={600}>
-                                    Ada kasus
-                                  </Text>
-                                </Group>
-                              )}
-                              {r.escalatedFlags > 0 && (
-                                <Group gap={2} c="red.8">
-                                  <IconAlertTriangle size={14} />
-                                  <Text size="xs" fw={600}>
-                                    {r.escalatedFlags} bendera
-                                  </Text>
-                                </Group>
-                              )}
-                              {r.patternFlags > 0 && (
-                                <Group gap={2} c="red.8">
-                                  <IconTrendingDown size={14} />
-                                  <Text size="xs" fw={600}>
-                                    Pola pulse rendah
-                                  </Text>
-                                </Group>
-                              )}
-                            </Group>
-                            <TaskChips tasks={r.tasks} />
-                          </Stack>
-                        }
-                      />
-                    ))}
-                  </ListGroup>
-                ) : (
-                  <EmptyState title="Belum ada mentor binaan" />
-                )}
+                <PageSection title="Mentor binaan">
+                  {sorted.length ? (
+                    <ListGroup>
+                      {sorted.map((r) => (
+                        <LinkRow
+                          key={r.mentor.userId}
+                          to={`/koordinator/laporan/${r.mentor.userId}/${month}`}
+                          title={r.mentor.name}
+                          description={
+                            <Stack gap={6}>
+                              <Text size="xs" c="dimmed">
+                                {r.menteeCount} mentee · tingkat {r.tingkat} ·
+                                lapbul {r.journals.submitted} terkirim,{" "}
+                                {r.journals.responded} ditanggapi
+                                {r.journals.late
+                                  ? `, ${r.journals.late} terlambat`
+                                  : ""}
+                              </Text>
+                              <Group gap={6}>
+                                <StatusBadge
+                                  {...REPORT_STATUS[
+                                    r.report?.status ?? "not_started"
+                                  ]}
+                                />
+                                {r.report?.isLate && (
+                                  <StatusBadge
+                                    label="Terlambat"
+                                    tone="orange"
+                                  />
+                                )}
+                                {r.report?.hasCase && (
+                                  <Group gap={2} c="orange.8">
+                                    <IconShieldLock size={14} />
+                                    <Text size="xs" fw={600}>
+                                      Ada kasus
+                                    </Text>
+                                  </Group>
+                                )}
+                                {r.escalatedFlags > 0 && (
+                                  <Group gap={2} c="red.8">
+                                    <IconAlertTriangle size={14} />
+                                    <Text size="xs" fw={600}>
+                                      {r.escalatedFlags} bendera
+                                    </Text>
+                                  </Group>
+                                )}
+                                {r.patternFlags > 0 && (
+                                  <Group gap={2} c="red.8">
+                                    <IconTrendingDown size={14} />
+                                    <Text size="xs" fw={600}>
+                                      Pola pulse rendah
+                                    </Text>
+                                  </Group>
+                                )}
+                              </Group>
+                              <TaskChips tasks={r.tasks} />
+                            </Stack>
+                          }
+                        />
+                      ))}
+                    </ListGroup>
+                  ) : (
+                    <EmptyState title="Belum ada mentor binaan" />
+                  )}
+                </PageSection>
                 <Text size="xs" c="dimmed">
                   Koordinator melihat status saja: isi lapbul, data ekonomi, dan
                   isi kasus tidak ditampilkan.

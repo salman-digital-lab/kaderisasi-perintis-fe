@@ -31,8 +31,8 @@ export function StaffJournalPage() {
         {(data) => {
           const j = data.journal;
           return (
-            <Stack gap="md">
-              <Paper p="md">
+            <Stack gap="lg">
+              <Paper p="lg">
                 <Text size="sm" c="dimmed">
                   {data.mentee.university} · T{data.mentee.tingkat} ·{" "}
                   {CATEGORY_LABEL[data.mentee.category]}
@@ -49,7 +49,7 @@ export function StaffJournalPage() {
                 )}
               </Paper>
               {j.flag && (
-                <Paper p="md">
+                <Paper p="lg">
                   <Title order={4}>Bendera kesejahteraan</Title>
                   <Text size="sm">{FLAG_TRIGGER[j.flag.trigger]}</Text>
                   {j.flag.privateNote && (
@@ -65,7 +65,7 @@ export function StaffJournalPage() {
                 </Paper>
               )}
               {j.response && (
-                <Paper p="md">
+                <Paper p="lg">
                   <Title order={4} mb="xs">
                     Tanggapan mentor
                   </Title>

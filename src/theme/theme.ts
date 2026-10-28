@@ -133,7 +133,7 @@ export const theme = createTheme({
     grape: navy,
   },
   radius: { xs: "6px", sm: "10px", md: "16px", lg: "20px", xl: "999px" },
-  spacing: { xs: "8px", sm: "12px", md: "16px", lg: "24px", xl: "32px" },
+  spacing: { xs: "8px", sm: "12px", md: "16px", lg: "20px", xl: "32px" },
   respectReducedMotion: true,
   autoContrast: true,
   variantColorResolver: (input) => {

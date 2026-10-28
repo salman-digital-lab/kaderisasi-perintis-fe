@@ -136,7 +136,7 @@ export function MenteeHomePage() {
         </Stack>
       }
     >
-      <Stack gap="md">
+      <Stack gap="lg">
         {!month ? (
           <EmptyState
             title="Program belum dimulai"
@@ -180,7 +180,7 @@ export function MenteeHomePage() {
                     </Group>
                   </Paper>
                 ))}
-                <Paper p="md">
+                <Paper p="lg">
                   <Group gap="sm" wrap="nowrap" align="flex-start">
                     <ThemeIcon
                       size={40}
@@ -213,7 +213,7 @@ export function MenteeHomePage() {
                     </div>
                   </Group>
                 </Paper>
-                <Paper p="md">
+                <Paper p="lg">
                   <Title order={3} mb="sm">
                     Tanggal penting
                   </Title>

@@ -99,11 +99,11 @@ function PulseInput({
   onChange: (p: Pulse) => void;
 }) {
   return (
-    <Stack gap="sm">
+    <Stack gap="md">
       {PULSE_ITEMS.map((item) => (
         <div key={item.key}>
-          <Group justify="space-between" mb={4}>
-            <Text size="sm" fw={600}>
+          <Group justify="space-between" mb={8}>
+            <Text size="sm" fw={500}>
               {item.label}
             </Text>
             <Text size="xs" c="dimmed">
@@ -143,11 +143,11 @@ function Field({
 }) {
   return (
     <div>
-      <Text size="sm" fw={600} mb={hint ? 0 : 6}>
+      <Text fw={600} mb={hint ? 2 : 10}>
         {label}
       </Text>
       {hint && (
-        <Text size="xs" c="dimmed" mb={6}>
+        <Text size="xs" c="dimmed" mb={12}>
           {hint}
         </Text>
       )}
@@ -393,8 +393,8 @@ function Wizard({ detail }: { detail: JournalDetail }) {
           </Button>
         }
       >
-        <Stack gap="md">
-          <Paper p="md">
+        <Stack gap="lg">
+          <Paper p="lg">
             <Title order={2} size="h3">
               Sebelum mulai
             </Title>
@@ -414,7 +414,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
               ]}
             />
           </Paper>
-          <Paper p="md">
+          <Paper p="lg">
             <Checkbox
               checked={honesty}
               onChange={(e) => setHonesty(e.currentTarget.checked)}
@@ -490,7 +490,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
           Data ini diambil dari sistem, tidak perlu diketik ulang. Data keliru?
           Sampaikan ke mentor.
         </Text>
-        <Paper p="md">
+        <Paper p="lg">
           <KeyValue
             items={[
               ["Nama", detail.autoData.name],
@@ -533,7 +533,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
       </Stack>
     ),
     kabar: () => (
-      <Stack gap="lg">
+      <Stack gap="md" className="formStep">
         <Field
           label="1a · Pulse bulan ini"
           hint="Seberapa baik kondisimu di tiap bidang?"
@@ -584,7 +584,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
       </Stack>
     ),
     target: () => (
-      <Stack gap="lg">
+      <Stack gap="md" className="formStep">
         {detail.previousTargets ? (
           <Field label="2a · Status tiga target bulan lalu">
             <Stack gap="sm">
@@ -653,7 +653,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
       </Stack>
     ),
     insight: () => (
-      <Stack gap="lg">
+      <Stack gap="md" className="formStep">
         <Textarea
           label="3a · Insight terbesar bulan ini"
           description="2–4 kalimat: dari mentoring, kegiatan, kuliah, atau organisasi."
@@ -668,7 +668,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
       </Stack>
     ),
     ruhiyah: () => (
-      <Stack gap="lg">
+      <Stack gap="md" className="formStep">
         <NumberInput
           label="5a · Tilawah/bacaan kitab suci bulan ini (halaman)"
           min={0}
@@ -724,16 +724,18 @@ function Wizard({ detail }: { detail: JournalDetail }) {
       </Stack>
     ),
     ukhuwah: () => (
-      <Textarea
-        label="6 · Satu teman Perintis yang baru kamu kenal atau makin dekat, dan satu hal yang kamu pelajari darinya"
-        minRows={3}
-        value={a.s6 ?? ""}
-        maxLength={MAX_LONG}
-        onChange={(e) => setAnswers({ s6: e.currentTarget.value })}
-      />
+      <Stack className="formStep">
+        <Textarea
+          label="6 · Satu teman Perintis yang baru kamu kenal atau makin dekat, dan satu hal yang kamu pelajari darinya"
+          minRows={3}
+          value={a.s6 ?? ""}
+          maxLength={MAX_LONG}
+          onChange={(e) => setAnswers({ s6: e.currentTarget.value })}
+        />
+      </Stack>
     ),
     nilai: () => (
-      <Stack gap="lg">
+      <Stack gap="md" className="formStep">
         <NumberInput
           label="7 · IP semester"
           inputMode="decimal"
@@ -748,7 +750,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
       </Stack>
     ),
     ekonomi: () => (
-      <Stack gap="lg">
+      <Stack gap="md" className="formStep">
         <Field label="8a · Apakah kondisi ekonomi keluarga atau kebutuhan biaya hidupmu berubah bulan ini?">
           <SegmentedControl
             fullWidth
@@ -795,7 +797,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
         files: form.files,
       };
       return (
-        <Stack gap="md">
+        <Stack gap="lg">
           {missing.length ? (
             <Alert color="yellow" variant="light" title="Masih ada isian wajib">
               <Stack gap="xs">
@@ -863,7 +865,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
         </Group>
       }
     >
-      <Stack gap="md">
+      <Stack gap="lg">
         <div>
           <Group justify="space-between" mb={6}>
             <Text size="xs" c="dimmed" fw={600}>

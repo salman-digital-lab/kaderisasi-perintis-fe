@@ -36,7 +36,7 @@ function DemoSettings() {
       title="Mode demo"
       description="Data contoh disimpan di peramban ini; belum ada backend."
     >
-      <Stack gap="md">
+      <Stack gap="lg">
         <Radio.Group
           label="Tanggal simulasi"
           description="Ganti tanggal untuk mencoba tenggat (tgl 5, 12, 15)."
@@ -90,8 +90,8 @@ export function AccountPage() {
   const navigate = useNavigate();
   return (
     <Screen title="Akun">
-      <Stack gap="md">
-        <Paper p="md">
+      <Stack gap="lg">
+        <Paper p="lg">
           <Group wrap="nowrap">
             <Avatarish name={me.profile.name} size={52} />
             <div style={{ minWidth: 0 }}>
@@ -170,8 +170,8 @@ export function StaffAccountPage() {
   const staff = auth.staff!;
   return (
     <Screen title="Akun staf">
-      <Stack gap="md">
-        <Paper p="md">
+      <Stack gap="lg">
+        <Paper p="lg">
           <Group wrap="nowrap">
             <Avatarish name={staff.name} size={52} />
             <div style={{ minWidth: 0 }}>

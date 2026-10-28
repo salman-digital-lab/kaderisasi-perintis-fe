@@ -79,7 +79,7 @@ function FlagPanel({ data }: { data: JournalForMentor }) {
   const active =
     flag.status === "open" || (flag.status === "escalated" && !flag.handledAt);
   return (
-    <Paper p="md" style={{ borderColor: "var(--mantine-color-red-4)" }}>
+    <Paper p="lg" style={{ borderColor: "var(--mantine-color-red-4)" }}>
       <Group justify="space-between" wrap="nowrap">
         <Group gap={6}>
           <IconAlertTriangle size={20} color="var(--mantine-color-red-7)" />
@@ -190,7 +190,7 @@ function ResponseForm({ data }: { data: JournalForMentor }) {
     return <Note icon={IconLock}>{data.respondLockedReason}</Note>;
 
   return (
-    <Stack gap="md">
+    <Stack gap="lg">
       {r && (
         <Text size="xs" c="dimmed">
           Tanggapan terakhir {fmtDateTime(r.respondedAt)}. Bisa disunting sampai{" "}
@@ -329,8 +329,8 @@ export function RespondPage() {
     >
       <Loadable query={query}>
         {(data) => (
-          <Stack gap="md">
-            <Paper p="md">
+          <Stack gap="lg">
+            <Paper p="lg">
               <Group wrap="nowrap" align="flex-start">
                 <Avatarish name={data.mentee.name} />
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -392,7 +392,7 @@ export function RespondPage() {
                 {data.history.length ? (
                   <Stack gap="sm">
                     {data.history.map((h) => (
-                      <Paper key={h.month} p="md">
+                      <Paper key={h.month} p="lg">
                         <Group justify="space-between" mb="xs">
                           <Title order={4}>{monthLabel(h.month)}</Title>
                           <StatusBadge {...JOURNAL_STATUS[h.status]} />

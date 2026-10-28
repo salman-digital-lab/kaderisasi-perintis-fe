@@ -360,8 +360,8 @@ export function ParticipantDetailPage() {
         {(d) => {
           const p = d.participant;
           return (
-            <Stack gap="md">
-              <Paper p="md">
+            <Stack gap="lg">
+              <Paper p="lg">
                 <Group wrap="nowrap" align="flex-start">
                   <Avatarish name={d.profile.name} size={52} />
                   <div style={{ minWidth: 0 }}>
@@ -487,7 +487,7 @@ export function ParticipantDetailPage() {
               )}
               {p.isMentee && (
                 <Section title="Catatan Perjalanan">
-                  <Stack gap="xs">
+                  <Stack gap={0} className="qa">
                     {d.journals.map((j) => (
                       <Group
                         key={j.month}

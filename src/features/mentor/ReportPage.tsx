@@ -123,12 +123,12 @@ function ReportForm({ detail }: { detail: ReportDetail }) {
     !!form.locationOrLink.trim();
 
   return (
-    <Stack gap="md">
-      <Paper p="md">
+    <Stack gap="lg">
+      <Paper p="lg">
         <Title order={3} mb="sm">
           Berita acara sesi
         </Title>
-        <Stack gap="md">
+        <Stack gap="lg">
           <TextInput
             type="date"
             label="Tanggal sesi"
@@ -190,7 +190,7 @@ function ReportForm({ detail }: { detail: ReportDetail }) {
           />
         </Stack>
       </Paper>
-      <Paper p="md">
+      <Paper p="lg">
         <Title order={3}>Foto kelompok</Title>
         <Text size="sm" c="dimmed" mb="sm">
           Minimal 1 foto. Sesi daring: tangkapan layar yang memperlihatkan
@@ -250,7 +250,7 @@ function ReportForm({ detail }: { detail: ReportDetail }) {
           )}
         </FileButton>
       </Paper>
-      <Paper p="md">
+      <Paper p="lg">
         <Title order={3}>Kasus untuk eskalasi</Title>
         <Text size="sm" c="dimmed" mb="sm">
           Opsional. Isinya hanya terlihat pengelola dan masuk daftar Perlu
@@ -339,7 +339,7 @@ export function ReportPage() {
     >
       <Loadable query={query}>
         {(d) => (
-          <Stack gap="md">
+          <Stack gap="lg">
             <Group justify="space-between">
               <StatusBadge
                 {...REPORT_STATUS[d.report?.status ?? "not_started"]}

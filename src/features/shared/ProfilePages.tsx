@@ -55,8 +55,8 @@ function ProfileView({ data }: { data: FullProfile }) {
   const status = PARTICIPANT_STATUS[pt.status];
 
   return (
-    <Stack gap="md">
-      <Paper p="md">
+    <Stack gap="lg">
+      <Paper p="lg">
         <Group wrap="nowrap" align="flex-start">
           <Avatarish name={p.name} size={56} />
           <div style={{ minWidth: 0 }}>
@@ -324,7 +324,7 @@ export function MenteeProfilePage({ back }: { back: string }) {
     >
       <Loadable query={query}>
         {(data) => (
-          <Stack gap="md">
+          <Stack gap="lg">
             {data.sensitiveHidden && (
               <Note icon={IconLock}>
                 Sebagai koordinator, data ekonomi, keluarga, dan kesehatan tidak

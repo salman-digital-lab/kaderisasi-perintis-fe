@@ -36,7 +36,7 @@ function ResponseCard({ detail }: { detail: JournalDetail }) {
 
   return (
     <Paper
-      p="md"
+      p="lg"
       style={{
         borderColor: "var(--mantine-color-teal-4)",
         background: "var(--mantine-color-teal-0)",
@@ -49,18 +49,18 @@ function ResponseCard({ detail }: { detail: JournalDetail }) {
         </Group>
         {wasUnread && <NewBadge />}
       </Group>
-      <Text size="xs" c="dimmed" mb="sm">
+      <Text size="xs" c="dimmed" mb="md">
         {r.respondedBy} · {fmtDateTime(r.respondedAt)}
       </Text>
-      <Stack gap="sm">
+      <Stack gap="md">
         <div>
-          <Text size="xs" fw={700} c="dimmed">
+          <Text size="xs" fw={700} c="dimmed" mb={4}>
             Apresiasi
           </Text>
           <MultilineText size="sm">{r.appreciation}</MultilineText>
         </div>
         <div>
-          <Text size="xs" fw={700} c="dimmed">
+          <Text size="xs" fw={700} c="dimmed" mb={4}>
             Tanggapan
           </Text>
           <MultilineText size="sm">{r.text}</MultilineText>
@@ -111,7 +111,7 @@ export function JournalViewPage() {
           const status = j?.status ?? "not_started";
           const submitted = j && j.status !== "draft";
           return (
-            <Stack gap="md">
+            <Stack gap="lg">
               <Group justify="space-between">
                 <StatusBadge {...JOURNAL_STATUS[status]} />
                 {j?.submittedAt && (

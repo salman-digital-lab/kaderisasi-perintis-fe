@@ -66,12 +66,12 @@ export function Section({
   children: ReactNode;
 }) {
   return (
-    <Paper p="md">
-      <Group justify="space-between" align="flex-start" wrap="nowrap" mb="sm">
+    <Paper p="lg">
+      <Group justify="space-between" align="flex-start" wrap="nowrap" mb="md">
         <Box>
           <Title order={3}>{title}</Title>
           {description && (
-            <Text size="sm" c="dimmed" mt={2}>
+            <Text size="sm" c="dimmed" mt={4}>
               {description}
             </Text>
           )}
@@ -80,6 +80,27 @@ export function Section({
       </Group>
       {children}
     </Paper>
+  );
+}
+
+/** A titled group of cards or a list on the page background (title sits close to its content). */
+export function PageSection({
+  title,
+  action,
+  children,
+}: {
+  title: ReactNode;
+  action?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section className={classes.pageSection}>
+      <Group justify="space-between" align="center" wrap="nowrap" mb="sm">
+        <Title order={3}>{title}</Title>
+        {action}
+      </Group>
+      {children}
+    </section>
   );
 }
 
@@ -130,7 +151,7 @@ export function LinkRow({
           {title}
         </Text>
         {description && (
-          <Text component="div" size="sm" c="dimmed" mt={2}>
+          <Text component="div" size="sm" c="dimmed" mt={4}>
             {description}
           </Text>
         )}

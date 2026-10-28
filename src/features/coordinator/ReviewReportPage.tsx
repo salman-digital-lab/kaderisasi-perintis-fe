@@ -66,7 +66,7 @@ function ReviewForm({ detail }: { detail: ReportDetail }) {
   });
   const valid = appreciation.trim() && note.trim();
   return (
-    <Paper p="md">
+    <Paper p="lg">
       <Title order={3} mb="xs">
         Tanggapan koordinator
       </Title>
@@ -154,7 +154,7 @@ export function ReviewReportPage() {
     >
       <Loadable query={query}>
         {(d) => (
-          <Stack gap="md">
+          <Stack gap="lg">
             <Group justify="space-between">
               <StatusBadge
                 {...REPORT_STATUS[d.report?.status ?? "not_started"]}
