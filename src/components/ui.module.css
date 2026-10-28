@@ -26,9 +26,10 @@
   border: 1px solid var(--surface-border);
   background: #ffffff;
   min-height: 3.5rem;
+  transition: background-color 120ms ease-out;
 }
 .rowButton:active {
-  background: #f6f9fc;
+  background: #eef2f8;
 }
 @media (hover: hover) and (pointer: fine) {
   .rowButton:hover {

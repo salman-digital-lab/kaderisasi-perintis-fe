@@ -51,6 +51,10 @@ export function ParticipantsPage() {
     >
       <Stack gap="sm">
         <TextInput
+          type="search"
+          enterKeyHint="search"
+          autoCapitalize="none"
+          autoCorrect="off"
           placeholder="Cari nama, email, atau NIM"
           leftSection={<IconSearch size={18} />}
           value={q}

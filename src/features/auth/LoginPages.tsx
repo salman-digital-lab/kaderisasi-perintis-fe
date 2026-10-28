@@ -76,6 +76,9 @@ function LoginForm({ kind }: { kind: Kind }) {
             label="Email"
             type="email"
             autoComplete="email"
+            autoCapitalize="none"
+            autoCorrect="off"
+            enterKeyHint="next"
             required
             value={email}
             onChange={(e) => setEmail(e.currentTarget.value)}
@@ -83,6 +86,7 @@ function LoginForm({ kind }: { kind: Kind }) {
           <PasswordInput
             label="Kata sandi"
             autoComplete="current-password"
+            enterKeyHint="go"
             required
             value={password}
             onChange={(e) => setPassword(e.currentTarget.value)}

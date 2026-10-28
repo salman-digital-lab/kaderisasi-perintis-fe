@@ -736,6 +736,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
       <Stack gap="lg">
         <NumberInput
           label="7 · IP semester"
+          inputMode="decimal"
           decimalScale={2}
           min={0}
           max={4}

@@ -120,6 +120,8 @@ function EditModal({
         <>
           <TextInput
             label="NIM"
+            inputMode="numeric"
+            autoComplete="off"
             value={form.nim ?? ""}
             onChange={(e) => set({ nim: e.currentTarget.value })}
           />

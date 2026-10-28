@@ -22,6 +22,7 @@ kapsul, kartu radius 16, chip status bertitik, dan info pill bergaris emas. Toke
 ```bash
 npm ci
 npm run dev        # http://localhost:3020
+npm run dev:phone  # also on your LAN IP, to open on a real phone
 npm run typecheck
 npm run lint
 npm run build

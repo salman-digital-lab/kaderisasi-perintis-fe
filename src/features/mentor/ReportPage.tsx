@@ -160,6 +160,8 @@ function ReportForm({ detail }: { detail: ReportDetail }) {
                 ? "mis. Selasar Masjid Salman ITB"
                 : "https://meet.google.com/…"
             }
+            type={form.mode === "luring" ? "text" : "url"}
+            autoCapitalize={form.mode === "luring" ? "sentences" : "none"}
             value={form.locationOrLink}
             onChange={(e) => set({ locationOrLink: e.currentTarget.value })}
           />

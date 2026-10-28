@@ -18,10 +18,14 @@ html {
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
 }
+/* App, not a document: no pull-to-refresh or page rubber band. */
+html,
+body {
+  overscroll-behavior: none;
+}
 body {
   margin: 0;
   background: var(--backdrop);
-  overscroll-behavior-y: none;
 }
 
 :where(h1, h2, h3, h4, p) {
@@ -35,7 +39,17 @@ body {
 :where(button, a, [role="button"]) {
   touch-action: manipulation;
 }
-:where(button, [role="button"], [role="tab"], .mantine-Button-root) {
+:where(
+  button,
+  [role="button"],
+  [role="tab"],
+  .mantine-Button-root,
+  .mantine-UnstyledButton-root,
+  .mantine-ActionIcon-root,
+  .mantine-Chip-label,
+  .mantine-SegmentedControl-label,
+  a.mantine-Paper-root
+) {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -72,13 +86,33 @@ body {
   );
 }
 
-/* Horizontally scrolling chip rows without a visible scrollbar. */
+/* Horizontally scrolling chip rows without a visible scrollbar; hitting the
+   edge must not chain into the browser's swipe-back gesture. */
 .hscroll {
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
 }
 .hscroll::-webkit-scrollbar {
   display: none;
+}
+
+/* Press feedback on finger-down, like a native control (hover never sticks). */
+:where(.mantine-Button-root, .mantine-ActionIcon-root, a.mantine-Paper-root) {
+  transition:
+    transform 120ms ease-out,
+    background-color 120ms ease-out;
+}
+:where(.mantine-Button-root, .mantine-ActionIcon-root):active:not(
+    :disabled,
+    [data-disabled],
+    [data-loading]
+  ) {
+  transform: scale(0.97);
+}
+:where(a.mantine-Paper-root):active {
+  transform: scale(0.985);
+  background-color: #f6f9fc;
 }
 
 /* First card over the blue hero band (status card in the design system). */
