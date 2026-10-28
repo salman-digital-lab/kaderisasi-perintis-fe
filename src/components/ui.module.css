@@ -1,0 +1,72 @@
+.kv {
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.kvRow {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 38%) 1fr;
+  gap: 0.75rem;
+  font-size: var(--mantine-font-size-sm);
+}
+.kvRow dt {
+  color: var(--mantine-color-dimmed);
+}
+.kvRow dd {
+  margin: 0;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.rowButton {
+  display: block;
+  width: 100%;
+  padding: 0.75rem var(--mantine-spacing-md);
+  border-radius: var(--mantine-radius-md);
+  border: 1px solid var(--surface-border);
+  background: var(--mantine-color-body);
+  min-height: 3.5rem;
+}
+.rowButton:active {
+  background: var(--surface-subtle);
+}
+@media (hover: hover) and (pointer: fine) {
+  .rowButton:hover {
+    background: var(--surface-subtle);
+  }
+}
+.row {
+  min-width: 0;
+}
+.chevron {
+  flex-shrink: 0;
+  color: var(--mantine-color-dimmed);
+}
+
+.pulse {
+  display: grid;
+  gap: 0.5rem;
+}
+.pulse .pulseItem {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr 1.25rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+.pulseCompact {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.25rem;
+  width: 4.5rem;
+}
+.pulseTrack {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  box-shadow: inset 0 0 0 1px var(--surface-border);
+  overflow: hidden;
+}
+.pulseFill {
+  height: 100%;
+  border-radius: 999px;
+}

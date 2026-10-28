@@ -1,0 +1,250 @@
+import {
+  Button,
+  Group,
+  NativeSelect,
+  Paper,
+  Progress,
+  SimpleGrid,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import {
+  IconAlertTriangle,
+  IconDownload,
+  IconFileImport,
+  IconUserQuestion,
+} from "@tabler/icons-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState, type ReactNode } from "react";
+import { Link } from "react-router";
+import { staffApi } from "@/api/endpoints";
+import { errorMessage } from "@/api/errors";
+import type { ExportKind } from "@/api/types";
+import { Screen } from "@/components/layout/Screen";
+import { EmptyState, Loadable, Section } from "@/components/ui";
+import { downloadCsv } from "@/lib/files";
+import { currentReportMonth, monthLabel, reportMonths } from "@/lib/time";
+
+const EXPORTS: { kind: ExportKind; label: string }[] = [
+  { kind: "rekap-mentee", label: "Rekap mentee" },
+  { kind: "tugas-mentor", label: "Tugas mentor (T1–T3)" },
+  { kind: "status-lapbul", label: "Status lapbul" },
+  { kind: "laporan-mentoring", label: "Laporan mentoring" },
+  { kind: "data-peserta", label: "Data peserta" },
+];
+
+function StatTile({
+  to,
+  icon,
+  value,
+  label,
+}: {
+  to: string;
+  icon: ReactNode;
+  value: number;
+  label: string;
+}) {
+  return (
+    <Paper
+      p="sm"
+      component={Link}
+      to={to}
+      style={{ textDecoration: "none", color: "inherit" }}
+    >
+      <Group justify="space-between" wrap="nowrap">
+        <Text size="xl" fw={800}>
+          {value}
+        </Text>
+        {icon}
+      </Group>
+      <Text size="xs" c="dimmed">
+        {label}
+      </Text>
+    </Paper>
+  );
+}
+
+const pct = (n: number, d: number) => (d ? Math.round((n / d) * 100) : 0);
+
+export function StaffDashboardPage() {
+  const [month, setMonth] = useState(currentReportMonth() ?? "");
+  const query = useQuery({
+    queryKey: ["staff", "dashboard", month],
+    queryFn: () => staffApi.dashboard(month || undefined),
+    enabled: !!month,
+  });
+  const exportCsv = useMutation({
+    mutationFn: (kind: ExportKind) => staffApi.exportCsv(kind, month),
+    onSuccess: ({ filename, csv }) => downloadCsv(filename, csv),
+    onError: (e) =>
+      notifications.show({ color: "red", message: errorMessage(e) }),
+  });
+
+  if (!month)
+    return (
+      <Screen title="Dasbor pemantauan">
+        <EmptyState title="Program belum dimulai" />
+      </Screen>
+    );
+
+  return (
+    <Screen title="Dasbor pemantauan" subtitle="Pengelola Perintis">
+      <Stack gap="md">
+        <NativeSelect
+          aria-label="Bulan laporan"
+          value={month}
+          onChange={(e) => setMonth(e.currentTarget.value)}
+          data={reportMonths().map((m) => ({ value: m, label: monthLabel(m) }))}
+        />
+        <Loadable query={query}>
+          {(d) => (
+            <>
+              <SimpleGrid cols={2} spacing="xs">
+                <StatTile
+                  to="/kelola/tindak-lanjut"
+                  icon={
+                    <IconAlertTriangle
+                      size={20}
+                      color="var(--mantine-color-red-7)"
+                    />
+                  }
+                  value={d.followupsOpen}
+                  label="Perlu tindak lanjut"
+                />
+                <StatTile
+                  to="/kelola/peserta?status=pending"
+                  icon={
+                    <IconUserQuestion
+                      size={20}
+                      color="var(--mantine-color-orange-7)"
+                    />
+                  }
+                  value={d.withoutMentor}
+                  label="Mentee tanpa mentor"
+                />
+              </SimpleGrid>
+              <Section
+                title="Indikator"
+                description={`Bab 5.2 · ${monthLabel(d.month)}`}
+              >
+                <Stack gap="md">
+                  {d.indicators.map((i) => {
+                    const value = pct(i.numerator, i.denominator);
+                    const ok =
+                      i.denominator > 0 &&
+                      i.numerator / i.denominator >= i.target;
+                    return (
+                      <div key={i.key}>
+                        <Group justify="space-between" mb={4} wrap="nowrap">
+                          <Text size="sm" fw={600}>
+                            {i.label}
+                          </Text>
+                          <Text
+                            size="sm"
+                            fw={800}
+                            c={ok ? "teal.8" : "orange.8"}
+                          >
+                            {i.denominator ? `${value}%` : "—"}
+                          </Text>
+                        </Group>
+                        <Progress
+                          value={value}
+                          color={ok ? "teal" : "orange"}
+                          size="md"
+                          radius="xl"
+                        />
+                        <Text size="xs" c="dimmed" mt={2}>
+                          {i.numerator}/{i.denominator} · target{" "}
+                          {Math.round(i.target * 100)}%
+                        </Text>
+                      </div>
+                    );
+                  })}
+                  <Text size="xs" c="dimmed">
+                    Sesi 0 dan kepuasan mentee dicatat di luar aplikasi.
+                  </Text>
+                </Stack>
+              </Section>
+              <Title order={3}>Per koordinator</Title>
+              <Stack gap="xs">
+                {d.byCoordinator.map((c) => (
+                  <Paper key={c.coordinator.userId} p="md">
+                    <Group justify="space-between" mb="xs" wrap="nowrap">
+                      <Text fw={700}>{c.coordinator.name}</Text>
+                      <Text size="xs" c="dimmed">
+                        {c.mentors} mentor · {c.mentees} mentee
+                      </Text>
+                    </Group>
+                    <SimpleGrid cols={2} spacing={6} verticalSpacing={4}>
+                      <Text size="sm">
+                        Lapbul terkirim{" "}
+                        <b>
+                          {c.submitted}/{c.mentees}
+                        </b>
+                      </Text>
+                      <Text size="sm">
+                        Terlambat <b>{c.late}</b>
+                      </Text>
+                      <Text size="sm">
+                        Ditanggapi{" "}
+                        <b>
+                          {c.responded}/{c.submitted}
+                        </b>
+                      </Text>
+                      <Text size="sm" c={c.activeFlags ? "red.8" : undefined}>
+                        Bendera aktif <b>{c.activeFlags}</b>
+                      </Text>
+                      <Text size="sm">
+                        Laporan diajukan{" "}
+                        <b>
+                          {c.reportsSubmitted}/{c.mentors}
+                        </b>
+                      </Text>
+                      <Text size="sm">
+                        Diverifikasi{" "}
+                        <b>
+                          {c.reportsVerified}/{c.mentors}
+                        </b>
+                      </Text>
+                    </SimpleGrid>
+                  </Paper>
+                ))}
+              </Stack>
+              <Section
+                title="Ekspor CSV"
+                description="Kolom tetap; data sensitif tidak ikut. Angka sama dengan layar."
+              >
+                <Stack gap="xs">
+                  {EXPORTS.map((e) => (
+                    <Button
+                      key={e.kind}
+                      variant="light"
+                      justify="space-between"
+                      rightSection={<IconDownload size={18} />}
+                      loading={
+                        exportCsv.isPending && exportCsv.variables === e.kind
+                      }
+                      onClick={() => exportCsv.mutate(e.kind)}
+                    >
+                      {e.label}
+                    </Button>
+                  ))}
+                </Stack>
+              </Section>
+              <Button
+                component={Link}
+                to="/kelola/impor"
+                variant="default"
+                leftSection={<IconFileImport size={18} />}
+              >
+                Impor peserta
+              </Button>
+            </>
+          )}
+        </Loadable>
+      </Stack>
+    </Screen>
+  );
+}

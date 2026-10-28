@@ -1,0 +1,133 @@
+/* The app renders as a phone-width column; wider screens see it centered. */
+.frame {
+  position: relative;
+  max-width: var(--app-max-width);
+  min-height: 100dvh;
+  margin-inline: auto;
+  background: var(--mantine-color-body);
+}
+@media (min-width: 40em) {
+  .frame {
+    box-shadow:
+      0 0 0 1px var(--surface-border),
+      var(--mantine-shadow-md);
+  }
+}
+
+.appBar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: calc(var(--app-bar-height) + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) 0.5rem 0;
+  padding-left: max(0.5rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.5rem, env(safe-area-inset-right, 0px));
+  border-bottom: 1px solid var(--surface-border);
+  background: color-mix(in srgb, var(--mantine-color-body) 92%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+}
+.appBarTitle {
+  flex: 1;
+  min-width: 0;
+  padding-inline: 0.5rem;
+}
+.appBarTitle h1 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.appBarTitle p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--mantine-color-dimmed);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.content {
+  padding: var(--mantine-spacing-md);
+  padding-left: max(var(--mantine-spacing-md), env(safe-area-inset-left, 0px));
+  padding-right: max(
+    var(--mantine-spacing-md),
+    env(safe-area-inset-right, 0px)
+  );
+  padding-bottom: calc(
+    var(--mantine-spacing-xl) + var(--bottom-space, 0px) +
+      env(safe-area-inset-bottom, 0px)
+  );
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  z-index: 100;
+  width: 100%;
+  max-width: var(--app-max-width);
+  transform: translateX(-50%);
+  padding: 0.75rem var(--mantine-spacing-md);
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--surface-border);
+  background: var(--mantine-color-body);
+}
+
+.tabBar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  z-index: 100;
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  width: 100%;
+  max-width: var(--app-max-width);
+  transform: translateX(-50%);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-top: 1px solid var(--surface-border);
+  background: var(--mantine-color-body);
+}
+.tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  min-height: var(--tab-bar-height);
+  color: var(--mantine-color-dimmed);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.tab[aria-current="page"] {
+  color: var(--mantine-primary-color-filled);
+}
+.tabIcon {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 1.875rem;
+  border-radius: 999px;
+  transition: background-color 150ms ease;
+}
+.tab[aria-current="page"] .tabIcon {
+  background: var(--mantine-primary-color-light);
+}
+.tab:active .tabIcon {
+  background: var(--surface-subtle);
+}
+.tabBadge {
+  position: absolute;
+  top: 0.375rem;
+  left: calc(50% + 0.5rem);
+}

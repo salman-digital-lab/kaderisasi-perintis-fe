@@ -1,0 +1,65 @@
+import { Group, Stack, Text } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import { participantApi } from "@/api/endpoints";
+import { Screen } from "@/components/layout/Screen";
+import { RoleSwitcher } from "@/components/RoleSwitcher";
+import {
+  EmptyState,
+  LinkRow,
+  Loadable,
+  NewBadge,
+  StatusBadge,
+} from "@/components/ui";
+import { JOURNAL_STATUS } from "@/content/labels";
+import { fmtDate, monthLabel } from "@/lib/time";
+
+export function JournalListPage() {
+  const query = useQuery({
+    queryKey: ["p", "journals"],
+    queryFn: participantApi.myJournals,
+  });
+  return (
+    <Screen
+      title="Catatan Perjalanan"
+      subtitle="Laporan bulanan & tanggapan mentor"
+      actions={<RoleSwitcher />}
+    >
+      <Loadable query={query}>
+        {(items) =>
+          items.length ? (
+            <Stack gap="xs">
+              {items.map((item) => (
+                <LinkRow
+                  key={item.month}
+                  to={`/lapbul/${item.month}`}
+                  title={monthLabel(item.month)}
+                  description={
+                    <Group gap={6}>
+                      <StatusBadge {...JOURNAL_STATUS[item.status]} />
+                      {item.isLate && (
+                        <Text size="xs" c="orange.8" fw={600}>
+                          Terlambat
+                        </Text>
+                      )}
+                      {item.submittedAt && (
+                        <Text size="xs">
+                          Dikirim {fmtDate(item.submittedAt, "D MMM")}
+                        </Text>
+                      )}
+                    </Group>
+                  }
+                  right={item.responseUnread ? <NewBadge /> : null}
+                />
+              ))}
+            </Stack>
+          ) : (
+            <EmptyState
+              title="Belum ada bulan laporan"
+              description="Catatan Perjalanan November 2026 dibuka 1 Desember 2026."
+            />
+          )
+        }
+      </Loadable>
+    </Screen>
+  );
+}

@@ -1,0 +1,27 @@
+.main {
+  min-height: 100dvh;
+  background: var(--surface-subtle);
+  padding: calc(2rem + env(safe-area-inset-top, 0px)) var(--mantine-spacing-md)
+    calc(2rem + env(safe-area-inset-bottom, 0px));
+}
+.logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--mantine-spacing-lg);
+}
+.logo img {
+  max-width: 100%;
+  height: auto;
+}
+.header {
+  margin-bottom: var(--mantine-spacing-lg);
+}
+.link {
+  color: var(--mantine-primary-color-filled);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.demo {
+  border-style: dashed;
+  background: var(--mantine-color-body);
+}
