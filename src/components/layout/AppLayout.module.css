@@ -111,6 +111,22 @@
   background: #ffffff;
 }
 
+/* While typing on a phone the keyboard needs the room; the bar comes back on blur. */
+@media (pointer: coarse) {
+  :global(
+      body:has(
+        main
+          :is(
+            textarea,
+            input:not([type="checkbox"], [type="radio"], [type="file"])
+          ):focus
+      )
+    )
+    .footer {
+    display: none;
+  }
+}
+
 .tabBar {
   position: fixed;
   bottom: 0;

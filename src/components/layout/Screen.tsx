@@ -3,6 +3,7 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import {
   createContext,
   useContext,
+  useEffect,
   useLayoutEffect,
   type CSSProperties,
   type ReactNode,
@@ -51,6 +52,8 @@ export function Screen({
     document.title = `${title} · Perintis`;
   }, [title]);
 
+  useKeepFieldAboveKeyboard();
+
   const bottomSpace = footer
     ? "5.5rem"
     : hasTabs && !hideTabs
@@ -96,4 +99,43 @@ export function Screen({
       {footer && <div className={classes.footer}>{footer}</div>}
     </>
   );
+}
+
+const isTextField = (el: Element | null): el is HTMLElement =>
+  el instanceof HTMLTextAreaElement ||
+  (el instanceof HTMLInputElement &&
+    !["checkbox", "radio", "file", "button", "submit"].includes(el.type));
+
+/**
+ * When the on-screen keyboard opens (the visual viewport shrinks) or a field
+ * gains focus, bring the focused field back into the visible area if the
+ * keyboard covers it. Browsers only scroll it to the keyboard's edge, and not
+ * at all when the viewport shrinks after focus.
+ */
+function useKeepFieldAboveKeyboard() {
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    let timer = 0;
+    const reveal = () => {
+      window.clearTimeout(timer);
+      // Wait for the keyboard animation to settle before measuring.
+      timer = window.setTimeout(() => {
+        const el = document.activeElement;
+        if (!isTextField(el)) return;
+        const rect = el.getBoundingClientRect();
+        const visibleBottom = vv.offsetTop + vv.height - 16;
+        const visibleTop = vv.offsetTop + 72;
+        if (rect.bottom > visibleBottom || rect.top < visibleTop)
+          el.scrollIntoView({ block: "center", behavior: "smooth" });
+      }, 250);
+    };
+    vv.addEventListener("resize", reveal);
+    document.addEventListener("focusin", reveal);
+    return () => {
+      window.clearTimeout(timer);
+      vv.removeEventListener("resize", reveal);
+      document.removeEventListener("focusin", reveal);
+    };
+  }, []);
 }

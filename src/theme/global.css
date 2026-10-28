@@ -17,6 +17,11 @@
 html {
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
+  /* Focus scrolling keeps fields clear of the sticky app bar and the bottom action bar. */
+  scroll-padding-top: calc(
+    var(--app-bar-height) + env(safe-area-inset-top, 0px) + 0.75rem
+  );
+  scroll-padding-bottom: 6.5rem;
 }
 /* App, not a document: no pull-to-refresh or page rubber band. */
 html,
