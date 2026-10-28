@@ -157,7 +157,7 @@ function AddForm({
         isMentee: form.isMentee,
         isMentor: form.isMentor,
         isCoordinator: form.isCoordinator,
-        nim: form.isMentee ? form.nim.trim() : null,
+        nim: form.isMentee ? form.nim.trim() || null : null,
         category: form.isMentee ? form.category : null,
         kipK: form.isMentee ? form.kipK : null,
         mentorUserId:
@@ -180,8 +180,6 @@ function AddForm({
     },
   });
   const noRole = !form.isMentee && !form.isMentor && !form.isCoordinator;
-  const menteeIncomplete =
-    form.isMentee && (!form.nim.trim() || !form.category || form.kipK == null);
 
   return (
     <Paper p="lg">
@@ -239,37 +237,9 @@ function AddForm({
         </Checkbox.Group>
         {form.isMentee && (
           <>
-            <TextInput
-              label="NIM"
-              required
-              inputMode="numeric"
-              autoComplete="off"
-              value={form.nim}
-              onChange={(e) => set({ nim: e.currentTarget.value })}
-            />
-            <Select
-              label="Kategori"
-              required
-              data={Object.entries(CATEGORY_LABEL).map(([value, label]) => ({
-                value,
-                label,
-              }))}
-              value={form.category}
-              onChange={(v) => set({ category: v as Category | null })}
-            />
-            <Select
-              label="KIP-K"
-              required
-              data={[
-                { value: "ya", label: "Ya" },
-                { value: "tidak", label: "Tidak" },
-              ]}
-              value={form.kipK == null ? null : form.kipK ? "ya" : "tidak"}
-              onChange={(v) => set({ kipK: v == null ? null : v === "ya" })}
-            />
             <Select
               label="Mentor"
-              description="Boleh dikosongkan; atur nanti dari halaman peserta."
+              description="Opsional; bisa diatur nanti lewat Pindah di halaman peserta."
               searchable
               clearable
               data={(mentors.data ?? [])
@@ -281,6 +251,45 @@ function AddForm({
               value={form.mentorUserId}
               onChange={(v) => set({ mentorUserId: v })}
             />
+            <Stack gap="sm" className={classes.later}>
+              <div>
+                <Text size="sm" fw={600}>
+                  Data beasiswa (opsional)
+                </Text>
+                <Text size="xs" c="dimmed">
+                  Boleh dikosongkan dan dilengkapi nanti lewat Ubah. Selama
+                  kategori belum diisi, mentee belum bisa mengisi Catatan
+                  Perjalanan.
+                </Text>
+              </div>
+              <TextInput
+                label="NIM"
+                inputMode="numeric"
+                autoComplete="off"
+                value={form.nim}
+                onChange={(e) => set({ nim: e.currentTarget.value })}
+              />
+              <Select
+                label="Kategori"
+                clearable
+                data={Object.entries(CATEGORY_LABEL).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
+                value={form.category}
+                onChange={(v) => set({ category: v as Category | null })}
+              />
+              <Select
+                label="KIP-K"
+                clearable
+                data={[
+                  { value: "ya", label: "Ya" },
+                  { value: "tidak", label: "Tidak" },
+                ]}
+                value={form.kipK == null ? null : form.kipK ? "ya" : "tidak"}
+                onChange={(v) => set({ kipK: v == null ? null : v === "ya" })}
+              />
+            </Stack>
           </>
         )}
         {form.isMentor && (
@@ -299,7 +308,7 @@ function AddForm({
         {save.isError && <Alert color="red">{errorMessage(save.error)}</Alert>}
         <Button
           leftSection={<IconUserPlus size={18} />}
-          disabled={noRole || menteeIncomplete}
+          disabled={noRole}
           loading={save.isPending}
           onClick={() => save.mutate()}
         >

@@ -260,7 +260,8 @@ export interface SaveJournalInput {
 // ---- Mentor ----
 
 export interface DashboardRow {
-  mentee: PersonSummary & { category: Category; tingkat: number };
+  /** `""` when the mentee's kategori is not set yet. */
+  mentee: PersonSummary & { category: Category | ""; tingkat: number };
   journalId: number | null;
   status: JournalListStatus;
   isLate: boolean;

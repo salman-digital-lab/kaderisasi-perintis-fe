@@ -224,9 +224,13 @@ function editability(j: Journal | null, month: string) {
   return { canEdit: true, lockedReason: null };
 }
 
+const MISSING_CATEGORY =
+  "Data kepesertaanmu belum lengkap: kategori beasiswa belum diisi. Hubungi pengelola agar bisa mengisi Catatan Perjalanan.";
+
 function journalDetail(userId: number, month: string): JournalDetail {
   const p = participant(userId);
   const j = findJournal(userId, month);
+  const edit = editability(j, month);
   return {
     month,
     category: j?.category ?? p.category ?? "dasar",
@@ -235,7 +239,9 @@ function journalDetail(userId: number, month: string): JournalDetail {
     autoData: autoData(userId, month, j),
     previousTargets: previousTargets(userId, month),
     revisionDueAt: revisionDueAt(j),
-    ...editability(j, month),
+    ...(!j && edit.canEdit && !p.category
+      ? { canEdit: false, lockedReason: MISSING_CATEGORY }
+      : edit),
   };
 }
 
@@ -254,6 +260,7 @@ function ensureJournal(userId: number, month: string): Journal {
   const existing = findJournal(userId, month);
   if (existing) return existing;
   const p = participant(userId);
+  if (!p.category) throw new ApiError(409, MISSING_CATEGORY);
   db().seq.journal += 1;
   const j: Journal = {
     id: db().seq.journal,
@@ -441,7 +448,7 @@ route(
       return {
         mentee: {
           ...person(m.userId)!,
-          category: m.category ?? "dasar",
+          category: m.category ?? "",
           tingkat: tingkatOf(m.userId),
         },
         journalId: j?.id ?? null,

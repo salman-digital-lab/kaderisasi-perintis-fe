@@ -25,7 +25,11 @@ import {
   Loadable,
   StatusBadge,
 } from "@/components/ui";
-import { PARTICIPANT_STATUS, ROLE_LABEL } from "@/content/labels";
+import {
+  menteeDataMissing,
+  PARTICIPANT_STATUS,
+  ROLE_LABEL,
+} from "@/content/labels";
 
 function Badges({ r }: { r: ParticipantRow }) {
   return (
@@ -33,6 +37,9 @@ function Badges({ r }: { r: ParticipantRow }) {
       <StatusBadge {...PARTICIPANT_STATUS[r.status]} />
       {!r.hasAccount && (
         <StatusBadge label="Akun belum aktif" tone="gray" variant="outline" />
+      )}
+      {r.roles.includes("mentee") && menteeDataMissing(r) && (
+        <StatusBadge label="Data belum lengkap" tone="red" variant="outline" />
       )}
       {r.roles.includes("mentee") && !r.clubOk && (
         <StatusBadge label="Belum ada club" tone="orange" variant="outline" />

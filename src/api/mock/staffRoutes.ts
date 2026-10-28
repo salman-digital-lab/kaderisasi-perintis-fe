@@ -421,14 +421,12 @@ route<UpdateParticipantInput>(
         "Peran koordinator tidak bisa dicabut selama masih membawahi mentor.",
       );
     if (body.isMentee) {
-      if (!body.nim?.trim()) throw new ApiError(422, "NIM wajib untuk mentee.");
-      if (!body.category)
-        throw new ApiError(422, "Kategori wajib untuk mentee.");
-      if (body.kipK == null)
-        throw new ApiError(422, "Status KIP-K wajib untuk mentee.");
-      const dup = db().participants.find(
-        (x) => x.nim === body.nim?.trim() && x.userId !== p.userId,
-      );
+      // NIM, kategori and KIP-K may be filled in later.
+      checkMenteeData(body.category);
+      const nim = body.nim?.trim();
+      const dup =
+        nim &&
+        db().participants.find((x) => x.nim === nim && x.userId !== p.userId);
       if (dup) throw new ApiError(409, "NIM sudah dipakai peserta lain.");
     }
     if (
@@ -440,9 +438,9 @@ route<UpdateParticipantInput>(
       isMentee: body.isMentee,
       isMentor: body.isMentor,
       isCoordinator: body.isCoordinator,
-      nim: body.isMentee ? body.nim?.trim() : null,
+      nim: body.isMentee ? body.nim?.trim() || null : null,
       kipK: body.isMentee ? body.kipK : null,
-      category: body.isMentee ? body.category : null,
+      category: body.isMentee ? body.category || null : null,
       kaderisasiOverride: body.isMentee ? body.kaderisasiOverride : null,
       kaderisasiOverrideNote: body.isMentee
         ? body.kaderisasiOverrideNote?.trim() || null
@@ -491,6 +489,11 @@ route("admin", "GET", "/perintis/members", ({ userId, query }) => {
     });
 });
 
+function checkMenteeData(category: string | null | undefined) {
+  if (category && !(category in CATEGORY_LABEL))
+    throw new ApiError(422, "Kategori tidak dikenal.");
+}
+
 function memberIdOf(id: number) {
   return `MSA${String(id).padStart(6, "0")}`;
 }
@@ -531,17 +534,13 @@ route<AddParticipantInput>(
     };
     let reserveMentor: Participant | undefined;
     if (body.isMentee) {
-      const nim = body.nim?.trim();
-      if (!nim) throw new ApiError(422, "NIM wajib untuk mentee.");
-      if (!body.category)
-        throw new ApiError(422, "Kategori wajib untuk mentee.");
-      if (body.kipK == null)
-        throw new ApiError(422, "Status KIP-K wajib untuk mentee.");
-      if (rows.some((x) => x.nim === nim))
+      const nim = body.nim?.trim() || null;
+      checkMenteeData(body.category);
+      if (nim && rows.some((x) => x.nim === nim))
         throw new ApiError(409, "NIM sudah dipakai peserta lain.");
       Object.assign(p, {
         nim,
-        category: body.category,
+        category: body.category || null,
         kipK: body.kipK,
         status: "pending",
       });

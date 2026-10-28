@@ -22,6 +22,20 @@ export const CATEGORY_LABEL: Record<Category, string> = {
   biaya_hidup: "Penerima biaya hidup",
 };
 
+/** Kategori label; a mentee enrolled before it was known shows a gap. */
+export const categoryLabel = (c: string | null | undefined) =>
+  (c && CATEGORY_LABEL[c as Category]) || "Kategori belum diisi";
+
+/**
+ * A mentee enrolled before NIM, kategori or KIP-K were known. Without a
+ * kategori they cannot start a lapbul (the kategori picks the form).
+ */
+export const menteeDataMissing = (p: {
+  nim: string | null;
+  category: Category | null;
+  kipK: boolean | null;
+}) => !p.nim || !p.category || p.kipK == null;
+
 export const PARTICIPANT_STATUS: Record<
   ParticipantStatus,
   { label: string; tone: Tone }

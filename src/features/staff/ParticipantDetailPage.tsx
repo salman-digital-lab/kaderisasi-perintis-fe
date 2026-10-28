@@ -46,6 +46,7 @@ import {
 import {
   CATEGORY_LABEL,
   JOURNAL_STATUS,
+  menteeDataMissing,
   OVERRIDE_LABEL,
   PARTICIPANT_STATUS,
   ROLE_LABEL,
@@ -53,6 +54,11 @@ import {
 import { monthLabel } from "@/lib/time";
 
 type ModalKind = "edit" | "mentor" | "status" | null;
+
+const missingFields = (p: ParticipantDetail["participant"]) =>
+  [!p.nim && "NIM", !p.category && "kategori", p.kipK == null && "KIP-K"]
+    .filter(Boolean)
+    .join(", ");
 
 function useSaved(id: number, onDone: () => void) {
   const queryClient = useQueryClient();
@@ -436,6 +442,14 @@ export function ParticipantDetailPage() {
             <>
               {p.isMentee && (
                 <Section title="Mentee">
+                  {menteeDataMissing(p) && (
+                    <Alert color="orange" variant="light" mb="md">
+                      Data belum lengkap ({missingFields(p)}). Lengkapi lewat
+                      Ubah.
+                      {!p.category &&
+                        " Selama kategori belum diisi, mentee belum bisa mengisi Catatan Perjalanan."}
+                    </Alert>
+                  )}
                   <KeyValue
                     items={[
                       ["NIM", p.nim],

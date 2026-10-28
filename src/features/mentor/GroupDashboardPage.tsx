@@ -36,7 +36,7 @@ import {
   StatusBadge,
 } from "@/components/ui";
 import {
-  CATEGORY_LABEL,
+  categoryLabel,
   FLAG_STATUS,
   FLAG_TRIGGER,
   JOURNAL_STATUS,
@@ -123,7 +123,7 @@ const COLUMNS: Column<DashboardRow>[] = [
             {r.mentee.name}
           </Anchor>
           <Text size="xs" c="dimmed">
-            T{r.mentee.tingkat} · {CATEGORY_LABEL[r.mentee.category]}
+            T{r.mentee.tingkat} · {categoryLabel(r.mentee.category)}
           </Text>
         </div>
       </Group>
@@ -311,7 +311,7 @@ export function GroupDashboardPage() {
                               <Stack gap={4}>
                                 <Text size="xs" c="dimmed">
                                   T{r.mentee.tingkat} ·{" "}
-                                  {CATEGORY_LABEL[r.mentee.category]}
+                                  {categoryLabel(r.mentee.category)}
                                 </Text>
                                 <Group gap={6}>
                                   <StatusBadge {...JOURNAL_STATUS[r.status]} />
