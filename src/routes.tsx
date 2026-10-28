@@ -43,6 +43,7 @@ import {
   MenteeProfilePage,
   MyProfilePage,
 } from "@/features/shared/ProfilePages";
+import { NotEnrolledPage } from "@/features/auth/NotEnrolledPage";
 import { NotFoundPage } from "@/features/shared/NotFoundPage";
 import { FollowupsPage } from "@/features/staff/FollowupsPage";
 import { ImportPage } from "@/features/staff/ImportPage";
@@ -60,7 +61,8 @@ function FullScreenLoader() {
 }
 
 function RequireParticipant() {
-  const { hasParticipant, me, meLoading } = useAuth();
+  const { hasParticipant, participantBlocked, me, meLoading } = useAuth();
+  if (participantBlocked) return <NotEnrolledPage kind="participant" />;
   if (!hasParticipant) return <Navigate to="/masuk" replace />;
   if (meLoading || !me) return <FullScreenLoader />;
   return <Outlet />;
@@ -70,6 +72,13 @@ function RequireStaff() {
   const { hasStaff, staff, staffLoading } = useAuth();
   if (!hasStaff) return <Navigate to="/staf/masuk" replace />;
   if (staffLoading || !staff) return <FullScreenLoader />;
+  if (!staff.permissions.some((p) => p.startsWith("perintis.")))
+    return (
+      <NotEnrolledPage
+        kind="staff"
+        message="Akun admin ini belum punya peran Pengelola Perintis."
+      />
+    );
   return <Outlet />;
 }
 
@@ -98,7 +107,10 @@ function RoleHome() {
   const { activeRole } = useAuth();
   if (!activeRole)
     return (
-      <NotFoundPage message="Akunmu tidak punya peran aktif di program pembinaan." />
+      <NotEnrolledPage
+        kind="participant"
+        message="Kepesertaanmu di program pembinaan sedang nonaktif."
+      />
     );
   return <Navigate to={ROLE_HOME[activeRole]} replace />;
 }

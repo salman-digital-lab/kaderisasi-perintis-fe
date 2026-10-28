@@ -200,8 +200,8 @@ function LoginForm({ kind }: { kind: Kind }) {
 }
 
 export function LoginPage() {
-  const { hasParticipant } = useAuth();
-  if (hasParticipant) return <Navigate to="/" replace />;
+  const { hasParticipant, participantBlocked } = useAuth();
+  if (hasParticipant || participantBlocked) return <Navigate to="/" replace />;
   return (
     <AuthLayout
       title="Masuk"

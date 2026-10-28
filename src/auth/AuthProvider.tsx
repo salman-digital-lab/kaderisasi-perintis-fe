@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { getToken, setToken } from "@/api/client";
+import { ApiError } from "@/api/errors";
 import { participantApi, staffApi } from "@/api/endpoints";
 import type { Me, Role, StaffUser } from "@/api/types";
 
@@ -15,6 +16,8 @@ const ROLE_KEY = "perintis.activeRole";
 
 interface AuthValue {
   hasParticipant: boolean;
+  /** Signed in but not enrolled (403 from /perintis/me): the reason to show. */
+  participantBlocked: string | null;
   hasStaff: boolean;
   me: Me | undefined;
   meLoading: boolean;
@@ -60,6 +63,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // A 401 clears the stored token inside the client; mirror it here.
   const hasParticipant = !!webToken && !meQuery.isError;
   const hasStaff = !!adminToken && !staffQuery.isError;
+  const participantBlocked =
+    !!webToken &&
+    meQuery.error instanceof ApiError &&
+    meQuery.error.status === 403
+      ? meQuery.error.message
+      : null;
 
   const roles = meQuery.data?.roles ?? [];
   const activeRole =
@@ -77,6 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo<AuthValue>(
     () => ({
       hasParticipant,
+      participantBlocked,
       hasStaff,
       me: meQuery.data,
       meLoading: !!webToken && meQuery.isLoading,
@@ -109,6 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }),
     [
       hasParticipant,
+      participantBlocked,
       hasStaff,
       meQuery.data,
       meQuery.isLoading,
