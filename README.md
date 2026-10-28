@@ -4,8 +4,20 @@ Aplikasi pembinaan **Beasiswa Perintis** BMKA Salman ITB: Catatan Perjalanan (la
 mentor, laporan mentoring, panel koordinator, dan area pengelola. Spesifikasi: `../docs/perintis/PRD.md`
 dan `../docs/perintis/DB_DESIGN.md`.
 
-Aplikasi web **mobile-first** yang tampil seperti aplikasi ponsel (bilah atas, menu bawah, kolom
-selebar ponsel di layar lebar). Rencana berikutnya: PWA.
+Aplikasi web **mobile-first** yang tampil seperti aplikasi ponsel (bilah atas, menu bawah). Di
+desktop (≥ 62em) halaman yang sama tampil sebagai dasbor: menu samping berwarna navy, konten
+lebar, dan bilah aksi menempel di bawah kolom konten. Rencana berikutnya: PWA.
+
+### Tata letak desktop
+
+- Bingkai ada di `src/components/layout/` (`TabLayout` = menu bawah + menu samping, `Screen` =
+  bilah atas, hero, konten, bilah aksi). Halaman tidak perlu tahu ukuran layar.
+- Lebar konten per halaman lewat `<Screen width>`: `narrow` (bawaan, 45rem) untuk formulir dan
+  detail, `wide` (75rem) untuk daftar dan dasbor.
+- Pemilih peran pindah ke bawah menu samping; tombol di bilah atas disembunyikan (`hiddenFrom="md"`).
+- Halaman masuk tampil sebagai kartu di tengah layar.
+- Tata letak khusus desktop per halaman (tabel, tampilan terbelah) menyusul bertahap: staf →
+  mentor → koordinator → mentee.
 
 ## Stack
 

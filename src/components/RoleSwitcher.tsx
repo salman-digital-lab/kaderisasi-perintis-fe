@@ -1,32 +1,63 @@
-import { Button, Menu } from "@mantine/core";
+import { Button, Menu, Text, UnstyledButton } from "@mantine/core";
 import {
   IconCheck,
   IconChevronDown,
   IconLogout,
+  IconSelector,
   IconShieldCheck,
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/auth/AuthProvider";
 import { ROLE_LABEL } from "@/content/labels";
 import { ROLE_HOME } from "@/lib/roles";
+import classes from "./layout/AppLayout.module.css";
 
-/** Header account menu: the roles the person holds, the staff area, and switching accounts. */
-export function RoleSwitcher() {
+/**
+ * Account menu: the roles the person holds, the staff area, and switching
+ * accounts. `bar` sits in the phone header (hidden on desktop); `sidebar`
+ * sits at the bottom of the desktop sidebar.
+ */
+export function RoleSwitcher({
+  placement = "bar",
+}: {
+  placement?: "bar" | "sidebar";
+}) {
   const { me, activeRole, setActiveRole, hasStaff, signOutParticipant } =
     useAuth();
   const navigate = useNavigate();
   const roles = me?.roles ?? [];
+  const roleLabel = activeRole ? ROLE_LABEL[activeRole] : "Peran";
+  const sidebar = placement === "sidebar";
+
   return (
-    <Menu position="bottom-end" width={220}>
+    <Menu
+      position={sidebar ? "top-start" : "bottom-end"}
+      width={sidebar ? 236 : 220}
+    >
       <Menu.Target>
-        <Button
-          variant="white"
-          size="compact-md"
-          rightSection={<IconChevronDown size={16} />}
-          aria-label="Ganti peran"
-        >
-          {activeRole ? ROLE_LABEL[activeRole] : "Peran"}
-        </Button>
+        {sidebar ? (
+          <UnstyledButton className={classes.sideAccount}>
+            <span className={classes.sideLabel}>
+              <Text size="sm" fw={700} truncate>
+                {me?.profile.name}
+              </Text>
+              <Text size="xs" opacity={0.8}>
+                {roleLabel}
+              </Text>
+            </span>
+            <IconSelector size={18} aria-hidden="true" />
+          </UnstyledButton>
+        ) : (
+          <Button
+            variant="white"
+            size="compact-md"
+            hiddenFrom="md"
+            rightSection={<IconChevronDown size={16} />}
+            aria-label="Ganti peran"
+          >
+            {roleLabel}
+          </Button>
+        )}
       </Menu.Target>
       <Menu.Dropdown>
         <Menu.Label>Masuk sebagai</Menu.Label>

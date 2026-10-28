@@ -145,3 +145,16 @@ body {
   border-radius: var(--mantine-radius-md);
   background: #ffffff;
 }
+
+/* Whole-screen centred message; inside the desktop login card it only needs a card's height. */
+.fullCenter {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: var(--mantine-spacing-md);
+}
+@media (min-width: $mantine-breakpoint-md) {
+  [data-plain] .fullCenter {
+    min-height: 28rem;
+  }
+}

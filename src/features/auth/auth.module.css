@@ -42,3 +42,17 @@
 .strip b {
   color: #1f5fb8;
 }
+
+/* Desktop: the page is a card on the backdrop, so it only needs its own height. */
+@media (min-width: $mantine-breakpoint-md) {
+  .main {
+    min-height: 0;
+  }
+  .hero {
+    padding-top: 2rem;
+    padding-inline: 2rem;
+  }
+  .body {
+    padding-inline: 2rem;
+  }
+}

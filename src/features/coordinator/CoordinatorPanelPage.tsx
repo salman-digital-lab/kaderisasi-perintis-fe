@@ -93,13 +93,14 @@ export function CoordinatorPanelPage() {
   });
   if (!current)
     return (
-      <Screen title="Panel koordinator" actions={<RoleSwitcher />}>
+      <Screen width="wide" title="Panel koordinator" actions={<RoleSwitcher />}>
         <EmptyState title="Program belum dimulai" />
       </Screen>
     );
   const due = deadlines(month);
   return (
     <Screen
+      width="wide"
       title="Beasiswa Perintis"
       subtitle="Koordinator"
       actions={<RoleSwitcher />}

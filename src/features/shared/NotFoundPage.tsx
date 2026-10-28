@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/ui";
 
 export function NotFoundPage({ message }: { message?: string }) {
   return (
-    <div style={{ minHeight: "100dvh", display: "grid", placeItems: "center" }}>
+    <div className="fullCenter">
       <EmptyState
         icon={IconMapOff}
         title="Halaman tidak ditemukan"

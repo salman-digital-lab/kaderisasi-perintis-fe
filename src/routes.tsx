@@ -10,6 +10,7 @@ import {
   IconUsers,
   IconUsersGroup,
 } from "@tabler/icons-react";
+import { Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, type ReactNode } from "react";
 import { Navigate, Outlet, Route, Routes } from "react-router";
@@ -21,6 +22,8 @@ import {
   TabLayout,
   type TabDef,
 } from "@/components/layout/TabLayout";
+import layoutClasses from "@/components/layout/AppLayout.module.css";
+import { RoleSwitcher } from "@/components/RoleSwitcher";
 import { PageLoader } from "@/components/ui";
 import { ROLE_HOME } from "@/lib/roles";
 import { AccountPage, StaffAccountPage } from "@/features/account/AccountPage";
@@ -161,11 +164,14 @@ function ParticipantShell() {
   return (
     <TabLayout
       tabs={activeRole ? tabsByRole[activeRole] : tabsByRole.mentee.slice(2)}
+      subtitle="Pembinaan Perintis"
+      sidebarFooter={<RoleSwitcher placement="sidebar" />}
     />
   );
 }
 
 function StaffShell() {
+  const { staff } = useAuth();
   const followups = useQuery({
     queryKey: ["staff", "followups", { status: "open" }],
     queryFn: () => staffApi.followups({ status: "open" }),
@@ -181,7 +187,24 @@ function StaffShell() {
     { to: "/kelola/peserta", label: "Peserta", icon: IconUsers },
     { to: "/kelola/akun", label: "Akun", icon: IconSettings },
   ];
-  return <TabLayout tabs={tabs} />;
+  return (
+    <TabLayout
+      tabs={tabs}
+      subtitle="Pengelola Perintis"
+      sidebarFooter={
+        <div className={layoutClasses.sideAccount}>
+          <span className={layoutClasses.sideLabel}>
+            <Text size="sm" fw={700} truncate>
+              {staff?.name}
+            </Text>
+            <Text size="xs" opacity={0.8} truncate>
+              {staff?.email}
+            </Text>
+          </span>
+        </div>
+      }
+    />
+  );
 }
 
 export function AppRoutes() {

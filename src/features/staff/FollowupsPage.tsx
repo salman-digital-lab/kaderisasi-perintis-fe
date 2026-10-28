@@ -95,7 +95,11 @@ export function FollowupsPage() {
   });
 
   return (
-    <Screen title="Perlu tindak lanjut" subtitle="Paling lama terbuka di atas">
+    <Screen
+      width="wide"
+      title="Perlu tindak lanjut"
+      subtitle="Paling lama terbuka di atas"
+    >
       <Stack gap="lg">
         <Chip.Group value={status} onChange={(v) => setStatus(v as string)}>
           <Group gap={6}>

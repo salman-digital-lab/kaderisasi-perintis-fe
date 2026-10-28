@@ -102,7 +102,7 @@ export function GroupDashboardPage() {
 
   if (!current)
     return (
-      <Screen title="Kelompok" actions={<RoleSwitcher />}>
+      <Screen width="wide" title="Kelompok" actions={<RoleSwitcher />}>
         <EmptyState
           title="Program belum dimulai"
           description="Dasbor terisi setelah lapbul November dibuka 1 Desember 2026."
@@ -113,6 +113,7 @@ export function GroupDashboardPage() {
   const due = deadlines(month);
   return (
     <Screen
+      width="wide"
       title="Beasiswa Perintis"
       subtitle="Mentor"
       actions={<RoleSwitcher />}

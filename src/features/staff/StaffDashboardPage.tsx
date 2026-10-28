@@ -87,13 +87,14 @@ export function StaffDashboardPage() {
 
   if (!month)
     return (
-      <Screen title="Dasbor pemantauan">
+      <Screen width="wide" title="Dasbor pemantauan">
         <EmptyState title="Program belum dimulai" />
       </Screen>
     );
 
   return (
     <Screen
+      width="wide"
       title="Beasiswa Perintis"
       subtitle="Pengelola Perintis"
       hero={

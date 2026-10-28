@@ -27,8 +27,15 @@ interface ScreenProps {
   hero?: ReactNode;
   /** Sticky action bar at the bottom (hides the tab bar). */
   footer?: ReactNode;
+  /**
+   * Desktop content width: `narrow` keeps forms and detail pages readable,
+   * `wide` lets lists and dashboards use the space. Phones ignore it.
+   */
+  width?: "narrow" | "wide";
   children: ReactNode;
 }
+
+const SCREEN_WIDTH = { narrow: "45rem", wide: "75rem" } as const;
 
 /** One app screen: sky-blue top bar, optional hero band, content, optional sticky footer. */
 export function Screen({
@@ -38,6 +45,7 @@ export function Screen({
   actions,
   hero,
   footer,
+  width = "narrow",
   children,
 }: ScreenProps) {
   const navigate = useNavigate();
@@ -61,7 +69,10 @@ export function Screen({
       : "0px";
 
   return (
-    <>
+    <div
+      className={classes.screen}
+      style={{ "--screen-width": SCREEN_WIDTH[width] } as CSSProperties}
+    >
       <header className={classes.appBar} data-hero={hero ? "" : undefined}>
         {back ? (
           <ActionIcon
@@ -75,7 +86,9 @@ export function Screen({
             <IconArrowLeft size={22} />
           </ActionIcon>
         ) : (
-          <PerintisMark size={36} />
+          <span className={classes.barMark}>
+            <PerintisMark size={36} />
+          </span>
         )}
         <div className={classes.appBarTitle}>
           <h1>{title}</h1>
@@ -97,7 +110,7 @@ export function Screen({
         )}
       </main>
       {footer && <div className={classes.footer}>{footer}</div>}
-    </>
+    </div>
   );
 }
 

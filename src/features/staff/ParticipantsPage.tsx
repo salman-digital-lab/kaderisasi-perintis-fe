@@ -36,6 +36,7 @@ export function ParticipantsPage() {
 
   return (
     <Screen
+      width="wide"
       title="Data peserta"
       subtitle="Mentee, mentor & kelompok, koordinator"
       actions={
