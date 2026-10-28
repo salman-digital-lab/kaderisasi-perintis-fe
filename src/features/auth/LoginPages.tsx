@@ -61,15 +61,21 @@ function LoginForm({ kind }: { kind: Kind }) {
 
   return (
     <>
-      <Button
-        fullWidth
-        variant="default"
-        leftSection={<IconBrandGoogle size={18} />}
-        onClick={google.open}
-      >
-        Masuk dengan Google
-      </Button>
-      <Divider label="atau dengan email" labelPosition="center" my="md" />
+      {/* Real Google sign-in needs Google Identity Services (not wired yet);
+          the mock simulates it with the demo accounts. */}
+      {USE_MOCK && (
+        <>
+          <Button
+            fullWidth
+            variant="default"
+            leftSection={<IconBrandGoogle size={18} />}
+            onClick={google.open}
+          >
+            Masuk dengan Google
+          </Button>
+          <Divider label="atau dengan email" labelPosition="center" my="md" />
+        </>
+      )}
       <form onSubmit={submit}>
         <Stack gap="sm">
           <TextInput

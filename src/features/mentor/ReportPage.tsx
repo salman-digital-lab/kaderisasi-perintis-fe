@@ -27,6 +27,7 @@ import type { ReportDetail, SaveReportInput, UploadedFile } from "@/api/types";
 import { useMe } from "@/auth/AuthProvider";
 import { Screen } from "@/components/layout/Screen";
 import { Loadable, StatusBadge } from "@/components/ui";
+import { useFileUrl } from "@/components/useFileUrl";
 import { REPORT_STATUS } from "@/content/labels";
 import { MAX_LONG } from "@/content/lapbulForm";
 import { toPayload } from "@/lib/files";
@@ -199,23 +200,7 @@ function ReportForm({ detail }: { detail: ReportDetail }) {
         <SimpleGrid cols={3} spacing="xs" mb="sm">
           {form.photos.map((p) => (
             <div key={p.key} style={{ position: "relative" }}>
-              {p.previewUrl ? (
-                <Image
-                  src={p.previewUrl}
-                  alt={p.name}
-                  h={96}
-                  radius="sm"
-                  fit="cover"
-                />
-              ) : (
-                <Paper
-                  h={96}
-                  bg="var(--surface-subtle)"
-                  style={{ display: "grid", placeItems: "center" }}
-                >
-                  <IconPhoto size={28} color="var(--mantine-color-gray-6)" />
-                </Paper>
-              )}
+              <PhotoThumb photo={p} />
               <ActionIcon
                 size={28}
                 radius="xl"
@@ -321,6 +306,21 @@ function ReviewSection({ detail }: { detail: ReportDetail }) {
     });
   }, [wasUnread, month, queryClient]);
   return <ReviewCard report={detail.report!} unread={wasUnread} />;
+}
+
+function PhotoThumb({ photo }: { photo: UploadedFile }) {
+  const url = useFileUrl(photo.key, photo.previewUrl);
+  return url ? (
+    <Image src={url} alt={photo.name} h={96} radius="sm" fit="cover" />
+  ) : (
+    <Paper
+      h={96}
+      bg="var(--surface-subtle)"
+      style={{ display: "grid", placeItems: "center" }}
+    >
+      <IconPhoto size={28} color="var(--mantine-color-gray-6)" />
+    </Paper>
+  );
 }
 
 export function ReportPage() {

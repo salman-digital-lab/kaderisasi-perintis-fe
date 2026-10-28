@@ -1,4 +1,4 @@
-import { admin, web } from "./client";
+import { admin, USE_MOCK, web } from "./client";
 import type {
   CoordinatorOverview,
   ExportKind,
@@ -41,10 +41,30 @@ export interface FilePayload {
   dataUrl: string | null;
 }
 
+/** Session shape of admin-be-go's /auth/login and /auth/me. */
+interface AdminSession {
+  access_token: string;
+  user: {
+    id: number;
+    email: string;
+    display_name: string | null;
+    roles: { code: string; name: string }[];
+  };
+  permissions: string[];
+}
+
 /** kaderisasi-web-be-go — participants (mentee, mentor, koordinator). */
 export const participantApi = {
-  login: (email: string, password: string) =>
-    web.post<{ token: string }>("/auth/login", { email, password }),
+  login: async (email: string, password: string) => {
+    if (USE_MOCK)
+      return web.post<{ token: string }>("/auth/login", { email, password });
+    // web-be's login: { data: { user, data, token: { type, token, expiresIn } } }.
+    const data = await web.post<{ token: { token: string } }>("/auth/login", {
+      email,
+      password,
+    });
+    return { token: data.token.token };
+  },
   loginGoogle: (email: string) =>
     web.post<{ token: string }>("/auth/google", { email }),
   me: () => web.get<Me>("/perintis/me"),
@@ -102,11 +122,28 @@ export const participantApi = {
 
 /** kaderisasi-admin-be-go — pengelola (staff). */
 export const staffApi = {
-  login: (email: string, password: string) =>
-    admin.post<{ token: string }>("/auth/login", { email, password }),
+  login: async (email: string, password: string) => {
+    if (USE_MOCK)
+      return admin.post<{ token: string }>("/auth/login", { email, password });
+    const session = await admin.post<AdminSession>("/auth/login", {
+      email,
+      password,
+    });
+    return { token: session.access_token };
+  },
   loginGoogle: (email: string) =>
     admin.post<{ token: string }>("/auth/google", { email }),
-  me: () => admin.get<StaffUser>("/auth/me"),
+  me: async (): Promise<StaffUser> => {
+    if (USE_MOCK) return admin.get<StaffUser>("/auth/me");
+    const session = await admin.get<AdminSession>("/auth/me");
+    return {
+      id: session.user.id,
+      name: session.user.display_name ?? session.user.email,
+      email: session.user.email,
+      roles: session.user.roles.map((r) => r.name),
+      permissions: session.permissions,
+    };
+  },
   dashboard: (month?: string) =>
     admin.get<StaffDashboard>(`/perintis/dashboard${qs({ month })}`),
   followups: (filters: { source?: string; status?: string }) =>

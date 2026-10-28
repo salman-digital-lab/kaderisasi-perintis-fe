@@ -48,12 +48,31 @@ Belum ada backend. Selama `VITE_USE_MOCK_API` bukan `false`, semua permintaan di
 | Salsabila Putri  | Mentor, bendera tereskalasi                       |
 | Pengelola BMKA   | Staf, semua izin `perintis.*`                     |
 
-Untuk memakai backend asli: salin `.env.example` ke `.env.local`, isi `VITE_USE_MOCK_API=false`,
-`VITE_WEB_API`, `VITE_ADMIN_API`. Klien ada di `src/api/client.ts` (token Bearer per backend).
+## Backend asli
 
-### Endpoint tambahan yang belum ada di PRD
+Endpoint `/v2/perintis/*` sudah ada di `kaderisasi-web-be-go` (peserta) dan
+`kaderisasi-admin-be-go` (pengelola), dengan tabel dari migrasi Ace di
+`kaderisasi-admin-be` (lihat `kaderisasi-admin-be-go/docs/PERINTIS.md`).
 
-Mock memakai beberapa endpoint kecil yang perlu disepakati saat backend dibuat:
+1. Salin `.env.example` ke `.env.local`, isi `VITE_USE_MOCK_API=false`, `VITE_WEB_API`,
+   `VITE_ADMIN_API`.
+2. Tambahkan origin aplikasi ini (mis. `http://localhost:3020`) ke `ADMIN_CORS_ORIGINS`
+   admin-be-go; web-be-go menerima semua origin.
+3. Masuk memakai email + kata sandi akun Kaderisasi (peserta) atau akun admin (staf).
+   Token staf diperbarui otomatis lewat cookie refresh.
+
+Catatan mode backend asli:
+
+- **Masuk dengan Google** baru tersedia di mock; versi asli butuh Google Identity
+  Services dan disembunyikan untuk sementara.
+- Berkas (bukti, KHS, foto kelompok) privat dan dimuat lewat `GET /perintis/files?key=`
+  dengan sesi, bukan URL publik.
+- Jam aplikasi memakai waktu nyata. Untuk demo, isi `VITE_PERINTIS_CLOCK` sama dengan
+  `PERINTIS_CLOCK` di kedua backend.
+
+### Endpoint tambahan di luar PRD
+
+Endpoint kecil ini dipakai aplikasi dan sudah diimplementasikan di backend:
 
 | Endpoint                                           | Backend | Kegunaan                                                              |
 | -------------------------------------------------- | ------- | --------------------------------------------------------------------- |

@@ -12,6 +12,7 @@ import { IconFileText, IconLock } from "@tabler/icons-react";
 import type { ReactNode } from "react";
 import type { Journal, JournalFile } from "@/api/types";
 import { MultilineText, PulseBars } from "@/components/ui";
+import { openFile, useApiTarget, useFileUrl } from "@/components/useFileUrl";
 import { TARGET_RESULTS } from "@/content/lapbulForm";
 import { formatSize } from "@/lib/files";
 import { asksForGrades } from "@/lib/time";
@@ -65,19 +66,45 @@ function Item({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-export function FileList({
-  files,
-}: {
-  files:
-    | JournalFile[]
-    | {
-        key: string;
-        name: string;
-        mime: string;
-        size: number;
-        previewUrl: string | null;
-      }[];
-}) {
+type ListedFile = {
+  key: string;
+  name: string;
+  mime: string;
+  size: number;
+  previewUrl: string | null;
+};
+
+function FileTile({ file }: { file: ListedFile }) {
+  const isImage = file.mime.startsWith("image/");
+  const url = useFileUrl(file.key, file.previewUrl, isImage);
+  const target = useApiTarget();
+  if (isImage && url)
+    return <Image src={url} alt={file.name} radius="sm" h={110} fit="cover" />;
+  return (
+    <Paper
+      p="xs"
+      bg="var(--surface-subtle)"
+      component="button"
+      type="button"
+      onClick={() => void openFile(target, file.key, file.previewUrl)}
+      style={{ textAlign: "left", cursor: "pointer" }}
+    >
+      <Group gap={6} wrap="nowrap">
+        <IconFileText size={20} />
+        <div style={{ minWidth: 0 }}>
+          <Text size="xs" fw={600} truncate>
+            {file.name}
+          </Text>
+          <Text size="xs" c="dimmed">
+            {formatSize(file.size)}
+          </Text>
+        </div>
+      </Group>
+    </Paper>
+  );
+}
+
+export function FileList({ files }: { files: JournalFile[] | ListedFile[] }) {
   if (!files.length)
     return (
       <Text size="sm" c="dimmed">
@@ -86,32 +113,9 @@ export function FileList({
     );
   return (
     <SimpleGrid cols={2} spacing="xs">
-      {files.map((f) =>
-        f.previewUrl && f.mime.startsWith("image/") ? (
-          <Image
-            key={f.key}
-            src={f.previewUrl}
-            alt={f.name}
-            radius="sm"
-            h={110}
-            fit="cover"
-          />
-        ) : (
-          <Paper key={f.key} p="xs" bg="var(--surface-subtle)">
-            <Group gap={6} wrap="nowrap">
-              <IconFileText size={20} />
-              <div style={{ minWidth: 0 }}>
-                <Text size="xs" fw={600} truncate>
-                  {f.name}
-                </Text>
-                <Text size="xs" c="dimmed">
-                  {formatSize(f.size)}
-                </Text>
-              </div>
-            </Group>
-          </Paper>
-        ),
-      )}
+      {files.map((f) => (
+        <FileTile key={f.key} file={f} />
+      ))}
     </SimpleGrid>
   );
 }

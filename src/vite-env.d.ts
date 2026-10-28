@@ -4,6 +4,7 @@ interface ImportMetaEnv {
   readonly VITE_USE_MOCK_API?: string;
   readonly VITE_WEB_API?: string;
   readonly VITE_ADMIN_API?: string;
+  readonly VITE_PERINTIS_CLOCK?: string;
 }
 
 interface ImportMeta {

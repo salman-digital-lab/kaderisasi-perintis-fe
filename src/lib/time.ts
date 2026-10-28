@@ -2,6 +2,7 @@ import dayjs, { type Dayjs } from "dayjs";
 import "dayjs/locale/id";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import { USE_MOCK } from "@/api/client";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -50,8 +51,18 @@ export function setClock(value: string): void {
   }
 }
 
+/**
+ * With the real API the clock is real time, shifted when VITE_PERINTIS_CLOCK
+ * matches the backend's PERINTIS_CLOCK demo setting.
+ */
+const realOffset = (() => {
+  const shifted = import.meta.env.VITE_PERINTIS_CLOCK;
+  return shifted ? dayjs(shifted).diff(dayjs()) : 0;
+})();
+
 /** Current time in Asia/Jakarta (simulated while the mock API is on). */
 export function now(): Dayjs {
+  if (!USE_MOCK) return dayjs().add(realOffset, "ms").tz(TZ);
   return dayjs(getClock()).tz(TZ);
 }
 
