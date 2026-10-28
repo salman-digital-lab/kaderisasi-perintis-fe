@@ -490,15 +490,22 @@ export function ParticipantDetailPage() {
               )}
               {p.isCoordinator && (
                 <Section title="Mentor binaan">
-                  <ListGroup>
-                    {d.mentors.map((m) => (
-                      <LinkRow
-                        key={m.userId}
-                        to={`/kelola/peserta/${m.userId}`}
-                        title={m.name}
-                      />
-                    ))}
-                  </ListGroup>
+                  {d.mentors.length ? (
+                    <ListGroup>
+                      {d.mentors.map((m) => (
+                        <LinkRow
+                          key={m.userId}
+                          to={`/kelola/peserta/${m.userId}`}
+                          title={m.name}
+                        />
+                      ))}
+                    </ListGroup>
+                  ) : (
+                    <Text size="sm" c="dimmed">
+                      Belum ada mentor binaan. Tetapkan koordinator ini di
+                      halaman mentornya (Ubah) atau lewat impor mentor.
+                    </Text>
+                  )}
                 </Section>
               )}
             </>

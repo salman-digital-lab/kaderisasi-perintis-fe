@@ -13,6 +13,8 @@ import type {
   Me,
   MentorDashboard,
   ParticipantDetail,
+  MemberCandidate,
+  AddParticipantInput,
   ParticipantRow,
   ParticipantStatus,
   ReportDetail,
@@ -174,6 +176,10 @@ export const staffApi = {
     admin.get<ParticipantRow[]>(`/perintis/participants${qs(filters)}`),
   participant: (id: number) =>
     admin.get<ParticipantDetail>(`/perintis/participants/${id}`),
+  searchMembers: (q: string) =>
+    admin.get<MemberCandidate[]>(`/perintis/members${qs({ q })}`),
+  addParticipant: (input: AddParticipantInput) =>
+    admin.post<ParticipantDetail>("/perintis/participants", input),
   updateParticipant: (id: number, input: UpdateParticipantInput) =>
     admin.put<ParticipantDetail>(`/perintis/participants/${id}`, input),
   moveMentee: (id: number, mentorUserId: number | null) =>

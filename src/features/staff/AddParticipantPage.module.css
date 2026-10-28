@@ -1,0 +1,25 @@
+/* A selectable member row inside the grouped list. */
+.result {
+  display: block;
+  width: 100%;
+  padding: 0.875rem var(--mantine-spacing-md);
+  background: #ffffff;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 120ms ease-out;
+}
+.result + .result {
+  box-shadow: inset 0 1px 0 var(--surface-border);
+}
+.result:active {
+  background: #eef2f8;
+}
+.result[data-selected] {
+  background: var(--mantine-color-blue-0);
+  box-shadow: inset 3px 0 0 var(--mantine-color-blue-6);
+}
+@media (hover: hover) and (pointer: fine) {
+  .result:hover {
+    background: var(--surface-subtle);
+  }
+}

@@ -56,14 +56,15 @@ Belum ada backend. Selama `VITE_USE_MOCK_API` bukan `false`, semua permintaan di
   tgl 5/12/15, dan kembalikan data contoh.
 - Akun demo ada di halaman masuk (kata sandi apa pun). Peserta di `/masuk`, staf di `/staf/masuk`.
 
-| Akun             | Peran                                             |
-| ---------------- | ------------------------------------------------- |
-| Aisyah Rahmawati | Mentee, lapbul Desember masih draf                |
-| Rizky Pratama    | Mentor, 4 mentee, 1 bendera terbuka               |
-| Hana Lestari     | Koordinator, 3 mentor                             |
-| Fajar Nugraha    | Mentee sekaligus mentor (pemilih peran di header) |
-| Salsabila Putri  | Mentor, bendera tereskalasi                       |
-| Pengelola BMKA   | Staf, semua izin `perintis.*`                     |
+| Akun             | Peran                                                |
+| ---------------- | ---------------------------------------------------- |
+| Aisyah Rahmawati | Mentee, lapbul Desember masih draf                   |
+| Rizky Pratama    | Mentor, 4 mentee, 1 bendera terbuka                  |
+| Hana Lestari     | Koordinator, 3 mentor                                |
+| Fajar Nugraha    | Mentee sekaligus mentor (pemilih peran di header)    |
+| Salsabila Putri  | Mentor, bendera tereskalasi                          |
+| Pengelola BMKA   | Staf (Pengelola Perintis)                            |
+| Super Admin      | Staf, juga bisa **Tambah peserta** dari data anggota |
 
 ## Backend asli
 
@@ -100,6 +101,8 @@ Endpoint kecil ini dipakai aplikasi dan sudah diimplementasikan di backend:
 | `POST /perintis/reports/me/{month}/review/read`    | web     | Hapus tanda **Baru** tanggapan koordinator                            |
 | `POST /perintis/uploads`                           | web     | Unggah foto laporan sebelum disimpan di draf                          |
 | `POST /perintis/journals/reopen`                   | admin   | Buka kembali lapbul yang belum pernah dibuat (body: mentee + bulan)   |
+| `GET /perintis/members?q=`                         | admin   | Super Admin: cari anggota kaderisasi (nama, email, no. anggota)       |
+| `POST /perintis/participants`                      | admin   | Super Admin: jadikan anggota itu peserta dengan peran pilihan         |
 
 ## Struktur
 

@@ -8,12 +8,13 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { IconFileImport, IconSearch } from "@tabler/icons-react";
+import { IconFileImport, IconSearch, IconUserPlus } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { staffApi } from "@/api/endpoints";
-import type { ParticipantRow } from "@/api/types";
+import { ADD_PARTICIPANT_PERMISSION, type ParticipantRow } from "@/api/types";
+import { useAuth } from "@/auth/AuthProvider";
 import { DataTable, useTableLayout, type Column } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import {
@@ -105,6 +106,8 @@ const COLUMNS: Column<ParticipantRow>[] = [
 
 export function ParticipantsPage() {
   const desktop = useTableLayout();
+  const { staff } = useAuth();
+  const canAdd = !!staff?.permissions.includes(ADD_PARTICIPANT_PERMISSION);
   const [params, setParams] = useSearchParams();
   const role = params.get("role") ?? "";
   const status = params.get("status") ?? "";
@@ -128,14 +131,28 @@ export function ParticipantsPage() {
       title="Data peserta"
       subtitle="Mentee, mentor & kelompok, koordinator"
       actions={
-        <ActionIcon
-          component={Link}
-          to="/kelola/impor"
-          variant="white"
-          aria-label="Impor peserta"
-        >
-          <IconFileImport size={22} />
-        </ActionIcon>
+        <Group gap="xs" wrap="nowrap">
+          {canAdd && (
+            <ActionIcon
+              component={Link}
+              to="/kelola/peserta/tambah"
+              variant="white"
+              aria-label="Tambah peserta dari data anggota"
+              title="Tambah peserta dari data anggota"
+            >
+              <IconUserPlus size={22} />
+            </ActionIcon>
+          )}
+          <ActionIcon
+            component={Link}
+            to="/kelola/impor"
+            variant="white"
+            aria-label="Impor peserta"
+            title="Impor peserta"
+          >
+            <IconFileImport size={22} />
+          </ActionIcon>
+        </Group>
       }
     >
       <Stack gap="sm">

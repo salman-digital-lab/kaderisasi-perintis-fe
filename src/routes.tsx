@@ -48,6 +48,7 @@ import {
 } from "@/features/shared/ProfilePages";
 import { NotEnrolledPage } from "@/features/auth/NotEnrolledPage";
 import { NotFoundPage } from "@/features/shared/NotFoundPage";
+import { AddParticipantPage } from "@/features/staff/AddParticipantPage";
 import { FollowupsPage } from "@/features/staff/FollowupsPage";
 import { ImportPage } from "@/features/staff/ImportPage";
 import { ParticipantDetailPage } from "@/features/staff/ParticipantDetailPage";
@@ -325,6 +326,7 @@ export function AppRoutes() {
           <Route index element={<StaffDashboardPage />} />
           <Route path="tindak-lanjut" element={<FollowupsPage />} />
           <Route path="peserta" element={<ParticipantsPage />} />
+          <Route path="peserta/tambah" element={<AddParticipantPage />} />
           <Route path="peserta/:userId" element={<ParticipantDetailPage />} />
           <Route path="lapbul/:id" element={<StaffJournalPage />} />
           <Route path="impor" element={<ImportPage />} />

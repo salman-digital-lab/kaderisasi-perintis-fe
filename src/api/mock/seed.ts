@@ -30,7 +30,7 @@ export interface MockDb {
   seq: { journal: number; report: number; file: number; user: number };
 }
 
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 
 const NOV = "2026-11-01";
 const DEC = "2026-12-01";
@@ -252,6 +252,40 @@ const people: PersonSeed[] = [
     major: "Teknik Lingkungan",
     intake: 2015,
     level: "Kader Lanjut",
+  }, // Kaderisasi members who are not in the programme yet (Super Admin search).
+  {
+    id: 301,
+    name: "Nadia Kusuma",
+    gender: "P",
+    university: "Institut Teknologi Bandung",
+    major: "Teknik Industri",
+    intake: 2025,
+  },
+  {
+    id: 302,
+    name: "Umar Faruq",
+    gender: "L",
+    university: "Institut Teknologi Bandung",
+    major: "Teknik Sipil",
+    intake: 2017,
+    level: "Kader Lanjut",
+  },
+  {
+    id: 303,
+    name: "Dewi Anggraeni",
+    gender: "P",
+    university: "Universitas Padjadjaran",
+    major: "Farmasi",
+    intake: 2025,
+  },
+  {
+    id: 304,
+    name: "Yoga Pratama",
+    gender: "L",
+    university: "Institut Teknologi Bandung",
+    major: "Teknik Elektro",
+    intake: 2020,
+    level: "Kader",
   },
 ];
 
@@ -869,6 +903,21 @@ export function createSeed(): MockDb {
         permissions: [
           "perintis.participants.read",
           "perintis.participants.manage",
+          "perintis.content.read",
+          "perintis.followups.manage",
+          "perintis.recap.read",
+          "perintis.recap.export",
+        ],
+      },
+      {
+        id: 2,
+        name: "Super Admin",
+        email: "superadmin@salmanitb.com",
+        roles: ["Super Admin"],
+        permissions: [
+          "perintis.participants.read",
+          "perintis.participants.manage",
+          "perintis.participants.add",
           "perintis.content.read",
           "perintis.followups.manage",
           "perintis.recap.read",

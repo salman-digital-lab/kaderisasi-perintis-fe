@@ -1,5 +1,6 @@
 import { ApiError } from "@/api/errors";
 import type {
+  AddParticipantInput,
   Category,
   CoordinatorRecap,
   ExportKind,
@@ -9,6 +10,7 @@ import type {
   ImportPreview,
   ImportPreviewRow,
   Indicator,
+  MemberCandidate,
   Participant,
   ParticipantDetail,
   ParticipantRow,
@@ -448,6 +450,121 @@ route<UpdateParticipantInput>(
       mentorUserId: body.isMentee ? p.mentorUserId : null,
       coordinatorUserId: body.isMentor ? body.coordinatorUserId : null,
     });
+    return detail(p.userId);
+  },
+);
+
+// Super Admin: search every kaderisasi member, then enrol one with roles.
+// Same rules and statuses as kaderisasi-admin-be-go AddParticipant.
+route("admin", "GET", "/perintis/members", ({ userId, query }) => {
+  requirePermission(userId, "perintis.participants.add");
+  const q = (query.get("q") ?? "").trim().toLowerCase();
+  if (q.length < 3)
+    throw new ApiError(422, "Ketik minimal 3 huruf untuk mencari anggota.");
+  return db()
+    .profiles.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.email.toLowerCase().includes(q) ||
+        memberIdOf(p.userId).toLowerCase().includes(q),
+    )
+    .sort(
+      (a, b) =>
+        Number(b.email.toLowerCase() === q) -
+          Number(a.email.toLowerCase() === q) || a.name.localeCompare(b.name),
+    )
+    .slice(0, 20)
+    .map((p): MemberCandidate => {
+      const row = db().participants.find((x) => x.userId === p.userId);
+      return {
+        userId: p.userId,
+        name: p.name,
+        email: p.email,
+        memberId: memberIdOf(p.userId),
+        university: p.university,
+        major: p.major,
+        intakeYear: p.intakeYear,
+        hasAccount: row?.hasAccount ?? p.userId !== 303,
+        participant: !!row,
+        roles: row ? rolesOf(row) : [],
+      };
+    });
+});
+
+function memberIdOf(id: number) {
+  return `MSA${String(id).padStart(6, "0")}`;
+}
+
+route<AddParticipantInput>(
+  "admin",
+  "POST",
+  "/perintis/participants",
+  ({ userId, body }) => {
+    requirePermission(userId, "perintis.participants.add");
+    const rows = db().participants;
+    if (!body.userId)
+      throw new ApiError(422, "Pilih anggota yang akan ditambahkan.");
+    if (rows.some((x) => x.userId === body.userId))
+      throw new ApiError(
+        409,
+        "Anggota ini sudah menjadi peserta. Ubah perannya dari halaman peserta.",
+      );
+    if (!db().profiles.some((x) => x.userId === body.userId))
+      throw new ApiError(404, "Anggota tidak ditemukan.");
+    if (!body.isMentee && !body.isMentor && !body.isCoordinator)
+      throw new ApiError(422, "Pilih minimal satu peran.");
+    const p: Participant = {
+      userId: body.userId,
+      isMentee: body.isMentee,
+      isMentor: body.isMentor,
+      isCoordinator: body.isCoordinator,
+      nim: null,
+      kipK: null,
+      category: null,
+      kaderisasiOverride: null,
+      kaderisasiOverrideNote: null,
+      mentorUserId: null,
+      coordinatorUserId: null,
+      status: "active",
+      inactiveReason: null,
+      hasAccount: body.userId !== 303,
+    };
+    let reserveMentor: Participant | undefined;
+    if (body.isMentee) {
+      const nim = body.nim?.trim();
+      if (!nim) throw new ApiError(422, "NIM wajib untuk mentee.");
+      if (!body.category)
+        throw new ApiError(422, "Kategori wajib untuk mentee.");
+      if (body.kipK == null)
+        throw new ApiError(422, "Status KIP-K wajib untuk mentee.");
+      if (rows.some((x) => x.nim === nim))
+        throw new ApiError(409, "NIM sudah dipakai peserta lain.");
+      Object.assign(p, {
+        nim,
+        category: body.category,
+        kipK: body.kipK,
+        status: "pending",
+      });
+      if (body.mentorUserId != null) {
+        const m = rows.find((x) => x.userId === body.mentorUserId);
+        if (!m || !m.isMentor || m.status === "inactive")
+          throw new ApiError(422, "Mentor tidak valid.");
+        p.mentorUserId = m.userId;
+        p.status = "active";
+        if (m.status === "reserve") reserveMentor = m;
+      }
+    }
+    if (body.isMentor) {
+      if (body.coordinatorUserId != null) {
+        const c = rows.find((x) => x.userId === body.coordinatorUserId);
+        if (!c || !c.isCoordinator || c.status === "inactive")
+          throw new ApiError(422, "Koordinator tidak valid.");
+        p.coordinatorUserId = c.userId;
+      }
+      if (!body.isMentee && !body.isCoordinator) p.status = "reserve";
+    }
+    if (reserveMentor) reserveMentor.status = "active";
+    rows.push(p);
     return detail(p.userId);
   },
 );

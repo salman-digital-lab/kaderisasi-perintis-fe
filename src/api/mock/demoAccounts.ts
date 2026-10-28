@@ -31,6 +31,11 @@ export const DEMO_STAFF = [
   {
     email: "pengelola@salmanitb.com",
     label: "Pengelola BMKA",
-    hint: "Pengelola Perintis · semua izin",
+    hint: "Pengelola Perintis",
+  },
+  {
+    email: "superadmin@salmanitb.com",
+    label: "Super Admin",
+    hint: "Bisa menambah peserta dari data anggota",
   },
 ];

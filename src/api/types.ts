@@ -517,6 +517,37 @@ export interface UpdateParticipantInput {
   coordinatorUserId: number | null;
 }
 
+/** A kaderisasi member found by the Super Admin search (`GET /perintis/members`). */
+export interface MemberCandidate {
+  userId: number;
+  name: string;
+  email: string | null;
+  memberId: string | null;
+  university: string | null;
+  major: string | null;
+  intakeYear: number | null;
+  hasAccount: boolean;
+  /** Already in the programme; `roles` lists what they hold. */
+  participant: boolean;
+  roles: Role[];
+}
+
+/** `POST /perintis/participants`: enrol a member with roles. */
+export interface AddParticipantInput {
+  userId: number;
+  isMentee: boolean;
+  isMentor: boolean;
+  isCoordinator: boolean;
+  nim: string | null;
+  kipK: boolean | null;
+  category: Category | null;
+  mentorUserId: number | null;
+  coordinatorUserId: number | null;
+}
+
+/** Permission for searching members and adding participants (Super Admin). */
+export const ADD_PARTICIPANT_PERMISSION = "perintis.participants.add";
+
 export type ImportKind = "mentee" | "mentor" | "matching";
 
 export interface ImportPreviewRow {
