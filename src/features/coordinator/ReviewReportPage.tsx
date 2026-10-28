@@ -1,6 +1,7 @@
 import {
   Alert,
   Button,
+  Grid,
   Group,
   Paper,
   Stack,
@@ -17,6 +18,7 @@ import { useParams } from "react-router";
 import { participantApi } from "@/api/endpoints";
 import { errorMessage } from "@/api/errors";
 import type { ReportDetail, ReviewDecision } from "@/api/types";
+import { useDesktop } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import { EmptyState, Loadable, StatusBadge } from "@/components/ui";
 import { REPORT_STATUS } from "@/content/labels";
@@ -122,6 +124,7 @@ function ReviewForm({ detail }: { detail: ReportDetail }) {
 
 export function ReviewReportPage() {
   const { mentorId = "", month = "" } = useParams();
+  const desktop = useDesktop();
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ["p", "review", mentorId, month],
@@ -151,63 +154,107 @@ export function ReviewReportPage() {
       title={query.data?.mentor.name ?? "Laporan mentor"}
       subtitle={`Laporan ${monthLabel(month)}`}
       back="/koordinator"
+      width="wide"
     >
       <Loadable query={query}>
-        {(d) => (
-          <Stack gap="lg">
-            <Group justify="space-between">
-              <StatusBadge
-                {...REPORT_STATUS[d.report?.status ?? "not_started"]}
-              />
-              {d.report?.isLate && (
-                <StatusBadge label="Diajukan terlambat" tone="orange" />
+        {(d) => {
+          const submitted = !!d.report && d.report.status !== "draft";
+          const statusRow = (
+            <>
+              <Group justify="space-between">
+                <StatusBadge
+                  {...REPORT_STATUS[d.report?.status ?? "not_started"]}
+                />
+                {d.report?.isLate && (
+                  <StatusBadge label="Diajukan terlambat" tone="orange" />
+                )}
+              </Group>
+            </>
+          );
+          const tasks = <TasksChecklist tasks={d.tasks} />;
+          const notSubmitted = (
+            <EmptyState
+              title="Laporan belum diajukan"
+              description="Mentor belum mengajukan laporan bulan ini."
+            />
+          );
+          const reviewCard = d.report?.review && (
+            <ReviewCard report={d.report} unread={false} />
+          );
+          const summary = submitted && <ReportSummary detail={d} />;
+          const form = d.report?.status === "submitted" && (
+            <ReviewForm detail={d} />
+          );
+          const unverifyButton = (
+            <>
+              {d.canUnverify && (
+                <Button
+                  variant="subtle"
+                  color="gray"
+                  loading={unverify.isPending}
+                  onClick={() =>
+                    modals.openConfirmModal({
+                      title: "Batalkan verifikasi?",
+                      centered: true,
+                      children: (
+                        <Text size="sm">
+                          Bisa dilakukan sampai{" "}
+                          {fmtDate(deadlines(month).unverifyUntil, "D MMMM")}.
+                        </Text>
+                      ),
+                      labels: {
+                        confirm: "Batalkan verifikasi",
+                        cancel: "Tidak",
+                      },
+                      confirmProps: { color: "red" },
+                      onConfirm: () => unverify.mutate(d.report!.id),
+                    })
+                  }
+                >
+                  Batalkan verifikasi
+                </Button>
               )}
-            </Group>
-            <TasksChecklist tasks={d.tasks} />
-            {!d.report || d.report.status === "draft" ? (
-              <EmptyState
-                title="Laporan belum diajukan"
-                description="Mentor belum mengajukan laporan bulan ini."
-              />
-            ) : (
-              <>
-                {d.report.review && (
-                  <ReviewCard report={d.report} unread={false} />
-                )}
-                <ReportSummary detail={d} />
-                {d.report.status === "submitted" && <ReviewForm detail={d} />}
-                {d.canUnverify && (
-                  <Button
-                    variant="subtle"
-                    color="gray"
-                    loading={unverify.isPending}
-                    onClick={() =>
-                      modals.openConfirmModal({
-                        title: "Batalkan verifikasi?",
-                        centered: true,
-                        children: (
-                          <Text size="sm">
-                            Bisa dilakukan sampai{" "}
-                            {fmtDate(deadlines(month).unverifyUntil, "D MMMM")}.
-                          </Text>
-                        ),
-                        labels: {
-                          confirm: "Batalkan verifikasi",
-                          cancel: "Tidak",
-                        },
-                        confirmProps: { color: "red" },
-                        onConfirm: () => unverify.mutate(d.report!.id),
-                      })
-                    }
-                  >
-                    Batalkan verifikasi
-                  </Button>
-                )}
-              </>
-            )}
-            <CurriculumCard curriculum={d.curriculum} />
-          </Stack>
-        )}
+            </>
+          );
+          const curriculum = <CurriculumCard curriculum={d.curriculum} />;
+          if (desktop)
+            return (
+              <Grid gap="lg">
+                <Grid.Col span={7}>
+                  <Stack gap="lg">
+                    {submitted ? summary : notSubmitted}
+                    {curriculum}
+                  </Stack>
+                </Grid.Col>
+                <Grid.Col span={5}>
+                  <Stack gap="lg" className="stickyAside stickyPane">
+                    {statusRow}
+                    {tasks}
+                    {submitted && reviewCard}
+                    {submitted && form}
+                    {submitted && unverifyButton}
+                  </Stack>
+                </Grid.Col>
+              </Grid>
+            );
+          return (
+            <Stack gap="lg">
+              {statusRow}
+              {tasks}
+              {!submitted ? (
+                notSubmitted
+              ) : (
+                <>
+                  {reviewCard}
+                  {summary}
+                  {form}
+                  {unverifyButton}
+                </>
+              )}
+              {curriculum}
+            </Stack>
+          );
+        }}
       </Loadable>
     </Screen>
   );

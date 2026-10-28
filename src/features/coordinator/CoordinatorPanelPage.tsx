@@ -1,5 +1,8 @@
 import {
+  Anchor,
   Badge,
+  Button,
+  Flex,
   Group,
   NativeSelect,
   Paper,
@@ -17,8 +20,10 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { participantApi } from "@/api/endpoints";
-import type { MentorTasks } from "@/api/types";
+import { Link } from "react-router";
+import type { CoordinatorRow, MentorTasks } from "@/api/types";
 import { DisplayTitle, InfoPill } from "@/components/brand";
+import { DataTable, useDesktop, type Column } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import {
@@ -84,6 +89,7 @@ function Stat({
 }
 
 export function CoordinatorPanelPage() {
+  const desktop = useDesktop();
   const current = currentReportMonth();
   const [month, setMonth] = useState(current ?? "");
   const query = useQuery({
@@ -98,6 +104,119 @@ export function CoordinatorPanelPage() {
       </Screen>
     );
   const due = deadlines(month);
+  const reportHref = (r: CoordinatorRow) =>
+    `/koordinator/laporan/${r.mentor.userId}/${month}`;
+  const columns: Column<CoordinatorRow>[] = [
+    {
+      key: "mentor",
+      header: "Mentor",
+      sortValue: (r) => r.mentor.name,
+      render: (r) => (
+        <>
+          <Anchor
+            component={Link}
+            to={reportHref(r)}
+            fw={700}
+            c="inherit"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {r.mentor.name}
+          </Anchor>
+          <Text size="xs" c="dimmed">
+            {r.menteeCount} mentee · tingkat {r.tingkat}
+          </Text>
+        </>
+      ),
+    },
+    {
+      key: "report",
+      header: "Laporan",
+      sortValue: (r) => REPORT_STATUS[r.report?.status ?? "not_started"].label,
+      render: (r) => (
+        <Stack gap={4} align="flex-start">
+          <StatusBadge {...REPORT_STATUS[r.report?.status ?? "not_started"]} />
+          {r.report?.isLate && <StatusBadge label="Terlambat" tone="orange" />}
+          {r.report?.hasCase && (
+            <Group gap={2} c="orange.8" wrap="nowrap">
+              <IconShieldLock size={14} />
+              <Text size="xs" fw={600}>
+                Ada kasus
+              </Text>
+            </Group>
+          )}
+        </Stack>
+      ),
+    },
+    {
+      key: "journals",
+      header: "Lapbul",
+      sortValue: (r) =>
+        r.menteeCount ? r.journals.submitted / r.menteeCount : 0,
+      render: (r) => (
+        <Text size="sm">
+          {r.journals.submitted}/{r.menteeCount} terkirim
+          <br />
+          <Text span size="xs" c="dimmed">
+            {r.journals.responded} ditanggapi
+            {r.journals.late ? ` · ${r.journals.late} terlambat` : ""}
+          </Text>
+        </Text>
+      ),
+    },
+    {
+      key: "attention",
+      header: "Perhatian",
+      sortValue: (r) => r.escalatedFlags * 10 + r.patternFlags,
+      render: (r) =>
+        r.escalatedFlags || r.patternFlags ? (
+          <Stack gap={4}>
+            {r.escalatedFlags > 0 && (
+              <Group gap={2} c="red.8" wrap="nowrap">
+                <IconAlertTriangle size={14} />
+                <Text size="xs" fw={600}>
+                  {r.escalatedFlags} bendera
+                </Text>
+              </Group>
+            )}
+            {r.patternFlags > 0 && (
+              <Group gap={2} c="red.8" wrap="nowrap">
+                <IconTrendingDown size={14} />
+                <Text size="xs" fw={600}>
+                  Pola pulse rendah
+                </Text>
+              </Group>
+            )}
+          </Stack>
+        ) : (
+          "—"
+        ),
+    },
+    {
+      key: "tasks",
+      header: "Tugas",
+      nowrap: true,
+      sortValue: (r) => Object.values(r.tasks).filter(Boolean).length,
+      render: (r) => <TaskChips tasks={r.tasks} />,
+    },
+    {
+      key: "action",
+      header: "",
+      nowrap: true,
+      render: (r) => (
+        <Group justify="flex-end">
+          <Button
+            size="xs"
+            variant={r.report?.status === "submitted" ? "filled" : "light"}
+            component={Link}
+            to={reportHref(r)}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {r.report?.status === "submitted" ? "Periksa" : "Buka"}
+          </Button>
+        </Group>
+      ),
+    },
+  ];
   return (
     <Screen
       width="wide"
@@ -118,21 +237,28 @@ export function CoordinatorPanelPage() {
     >
       <Stack gap="lg">
         <Paper p="lg" radius="lg" withBorder={false} className="raised">
-          <NativeSelect
-            aria-label="Bulan laporan"
-            value={month}
-            onChange={(e) => setMonth(e.currentTarget.value)}
-            data={reportMonths().map((m) => ({
-              value: m,
-              label: monthLabel(m),
-            }))}
-            mb="md"
-          />
-          <InfoPill
-            icon={<IconCalendarEvent size={17} />}
-            label={`Tenggat verifikasi · ${relativeDays(due.verifyDue)}`}
-            value={fmtDate(due.verifyDue, "dddd, D MMMM YYYY")}
-          />
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            gap={{ base: "md", md: "xl" }}
+            align={{ md: "center" }}
+            justify="space-between"
+          >
+            <NativeSelect
+              aria-label="Bulan laporan"
+              w={{ md: 260 }}
+              value={month}
+              onChange={(e) => setMonth(e.currentTarget.value)}
+              data={reportMonths().map((m) => ({
+                value: m,
+                label: monthLabel(m),
+              }))}
+            />
+            <InfoPill
+              icon={<IconCalendarEvent size={17} />}
+              label={`Tenggat verifikasi · ${relativeDays(due.verifyDue)}`}
+              value={fmtDate(due.verifyDue, "dddd, D MMMM YYYY")}
+            />
+          </Flex>
         </Paper>
         <Loadable query={query}>
           {(d) => {
@@ -169,12 +295,19 @@ export function CoordinatorPanelPage() {
                   />
                 </SimpleGrid>
                 <PageSection title="Mentor binaan">
-                  {sorted.length ? (
+                  {sorted.length && desktop ? (
+                    <DataTable
+                      columns={columns}
+                      rows={sorted}
+                      rowKey={(r) => r.mentor.userId}
+                      rowHref={reportHref}
+                    />
+                  ) : sorted.length ? (
                     <ListGroup>
                       {sorted.map((r) => (
                         <LinkRow
                           key={r.mentor.userId}
-                          to={`/koordinator/laporan/${r.mentor.userId}/${month}`}
+                          to={reportHref(r)}
                           title={r.mentor.name}
                           description={
                             <Stack gap={6}>
