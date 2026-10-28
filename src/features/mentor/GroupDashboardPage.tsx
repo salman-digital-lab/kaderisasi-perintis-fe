@@ -1,8 +1,11 @@
 import {
+  Anchor,
   Button,
+  Flex,
   Group,
   NativeSelect,
   Paper,
+  SimpleGrid,
   Stack,
   Text,
   ThemeIcon,
@@ -19,6 +22,7 @@ import { Link } from "react-router";
 import { participantApi } from "@/api/endpoints";
 import type { DashboardRow } from "@/api/types";
 import { DisplayTitle, InfoPill } from "@/components/brand";
+import { DataTable, useDesktop, type Column } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import { RoleSwitcher } from "@/components/RoleSwitcher";
 import {
@@ -91,7 +95,105 @@ function FlagBox({ row }: { row: DashboardRow }) {
   );
 }
 
+const canOpen = (r: DashboardRow) =>
+  !!r.journalId && r.status !== "draft" && r.status !== "not_started";
+
+/** Sent lapbul open for responding; mentees who have not sent one open their profile. */
+const rowTarget = (r: DashboardRow) =>
+  canOpen(r)
+    ? `/kelompok/lapbul/${r.journalId}`
+    : `/kelompok/mentee/${r.mentee.userId}`;
+
+const COLUMNS: Column<DashboardRow>[] = [
+  {
+    key: "name",
+    header: "Mentee",
+    sortValue: (r) => r.mentee.name,
+    render: (r) => (
+      <Group gap="sm" wrap="nowrap">
+        <Avatarish name={r.mentee.name} size={34} />
+        <div style={{ minWidth: 0 }}>
+          <Anchor
+            component={Link}
+            to={rowTarget(r)}
+            fw={700}
+            c="inherit"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {r.mentee.name}
+          </Anchor>
+          <Text size="xs" c="dimmed">
+            T{r.mentee.tingkat} · {CATEGORY_LABEL[r.mentee.category]}
+          </Text>
+        </div>
+      </Group>
+    ),
+  },
+  {
+    key: "status",
+    header: "Lapbul",
+    sortValue: (r) => JOURNAL_STATUS[r.status].label,
+    render: (r) => (
+      <Group gap={6} wrap="nowrap">
+        <StatusBadge {...JOURNAL_STATUS[r.status]} />
+        {r.isLate && (
+          <Text size="xs" c="orange.8" fw={600}>
+            Terlambat
+          </Text>
+        )}
+      </Group>
+    ),
+  },
+  {
+    key: "submitted",
+    header: "Dikirim",
+    nowrap: true,
+    sortValue: (r) => r.submittedAt ?? "",
+    render: (r) =>
+      r.submittedAt ? fmtDate(r.submittedAt, "D MMM, HH.mm") : "—",
+  },
+  {
+    key: "attention",
+    header: "Perhatian",
+    render: (r) =>
+      r.flag || r.inactiveStreak ? (
+        <Stack gap={4}>
+          {r.flag && <StatusBadge {...FLAG_STATUS[r.flag.status]} />}
+          {r.inactiveStreak && (
+            <Group gap={2} c="red.8" wrap="nowrap">
+              <IconUserExclamation size={14} />
+              <Text size="xs" fw={600}>
+                2 bulan tanpa lapbul
+              </Text>
+            </Group>
+          )}
+        </Stack>
+      ) : (
+        "—"
+      ),
+  },
+  {
+    key: "action",
+    header: "",
+    nowrap: true,
+    render: (r) => (
+      <Group justify="flex-end">
+        <Button
+          size="xs"
+          variant={canOpen(r) ? "light" : "default"}
+          component={Link}
+          to={rowTarget(r)}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {canOpen(r) ? "Buka lapbul" : "Lihat profil"}
+        </Button>
+      </Group>
+    ),
+  },
+];
+
 export function GroupDashboardPage() {
+  const desktop = useDesktop();
   const current = currentReportMonth();
   const [month, setMonth] = useState(current ?? "");
   const query = useQuery({
@@ -131,29 +233,46 @@ export function GroupDashboardPage() {
     >
       <Stack gap="lg">
         <Paper p="lg" radius="lg" withBorder={false} className="raised">
-          <NativeSelect
-            aria-label="Bulan laporan"
-            value={month}
-            onChange={(e) => setMonth(e.currentTarget.value)}
-            data={reportMonths().map((m) => ({
-              value: m,
-              label: `Lapbul ${monthLabel(m)}`,
-            }))}
-          />
-          {query.data && (
-            <>
-              <Title order={2} mt="md" mb="sm">
-                {query.data.toRespond
-                  ? `${query.data.toRespond} lapbul perlu ditanggapi`
-                  : "Semua lapbul sudah ditanggapi"}
-              </Title>
-              <InfoPill
-                icon={<IconClock size={17} />}
-                label={`Tenggat tanggapan · ${relativeDays(due.mentorDue)}`}
-                value={fmtDate(due.mentorDue, "dddd, D MMMM YYYY")}
-              />
-            </>
-          )}
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            gap={{ base: 0, md: "xl" }}
+            align={{ md: "center" }}
+          >
+            <NativeSelect
+              aria-label="Bulan laporan"
+              w={{ md: 260 }}
+              value={month}
+              onChange={(e) => setMonth(e.currentTarget.value)}
+              data={reportMonths().map((m) => ({
+                value: m,
+                label: `Lapbul ${monthLabel(m)}`,
+              }))}
+            />
+            {query.data && (
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                align={{ md: "center" }}
+                justify="space-between"
+                gap={{ md: "lg" }}
+                style={{ flex: 1 }}
+              >
+                <Title
+                  order={2}
+                  mt={{ base: "md", md: 0 }}
+                  mb={{ base: "sm", md: 0 }}
+                >
+                  {query.data.toRespond
+                    ? `${query.data.toRespond} lapbul perlu ditanggapi`
+                    : "Semua lapbul sudah ditanggapi"}
+                </Title>
+                <InfoPill
+                  icon={<IconClock size={17} />}
+                  label={`Tenggat tanggapan · ${relativeDays(due.mentorDue)}`}
+                  value={fmtDate(due.mentorDue, "dddd, D MMMM YYYY")}
+                />
+              </Flex>
+            )}
+          </Flex>
         </Paper>
         <Loadable query={query}>
           {(d) => {
@@ -164,25 +283,28 @@ export function GroupDashboardPage() {
             );
             return (
               <>
-                {flags.map((r) => (
-                  <FlagBox key={r.mentee.userId} row={r} />
-                ))}
+                {flags.length > 0 && (
+                  <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
+                    {flags.map((r) => (
+                      <FlagBox key={r.mentee.userId} row={r} />
+                    ))}
+                  </SimpleGrid>
+                )}
                 <PageSection title="Mentee">
-                  {d.rows.length ? (
+                  {d.rows.length && desktop ? (
+                    <DataTable
+                      columns={COLUMNS}
+                      rows={d.rows}
+                      rowKey={(r) => r.mentee.userId}
+                      rowHref={rowTarget}
+                    />
+                  ) : d.rows.length ? (
                     <ListGroup>
                       {d.rows.map((r) => {
-                        const canOpen =
-                          r.journalId &&
-                          r.status !== "draft" &&
-                          r.status !== "not_started";
                         return (
                           <LinkRow
                             key={r.mentee.userId}
-                            to={
-                              canOpen
-                                ? `/kelompok/lapbul/${r.journalId}`
-                                : `/kelompok/mentee/${r.mentee.userId}`
-                            }
+                            to={rowTarget(r)}
                             icon={<Avatarish name={r.mentee.name} />}
                             title={r.mentee.name}
                             description={

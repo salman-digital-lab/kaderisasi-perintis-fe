@@ -112,7 +112,7 @@ export function FileList({ files }: { files: JournalFile[] | ListedFile[] }) {
       </Text>
     );
   return (
-    <SimpleGrid cols={2} spacing="xs">
+    <SimpleGrid cols={{ base: 2, md: 3 }} spacing="xs">
       {files.map((f) => (
         <FileTile key={f.key} file={f} />
       ))}

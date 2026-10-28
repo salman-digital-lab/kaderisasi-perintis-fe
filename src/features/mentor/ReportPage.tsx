@@ -197,7 +197,7 @@ function ReportForm({ detail }: { detail: ReportDetail }) {
           Minimal 1 foto. Sesi daring: tangkapan layar yang memperlihatkan
           peserta. Hanya untuk bukti, tidak dipublikasikan.
         </Text>
-        <SimpleGrid cols={3} spacing="xs" mb="sm">
+        <SimpleGrid cols={{ base: 3, md: 4 }} spacing="xs" mb="sm">
           {form.photos.map((p) => (
             <div key={p.key} style={{ position: "relative" }}>
               <PhotoThumb photo={p} />
@@ -311,10 +311,16 @@ function ReviewSection({ detail }: { detail: ReportDetail }) {
 function PhotoThumb({ photo }: { photo: UploadedFile }) {
   const url = useFileUrl(photo.key, photo.previewUrl);
   return url ? (
-    <Image src={url} alt={photo.name} h={96} radius="sm" fit="cover" />
+    <Image
+      src={url}
+      alt={photo.name}
+      h={{ base: 96, md: 136 }}
+      radius="sm"
+      fit="cover"
+    />
   ) : (
     <Paper
-      h={96}
+      h={{ base: 96, md: 136 }}
       bg="var(--surface-subtle)"
       style={{ display: "grid", placeItems: "center" }}
     >

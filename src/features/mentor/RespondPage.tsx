@@ -3,6 +3,7 @@ import {
   Alert,
   Anchor,
   Button,
+  Grid,
   Group,
   Modal,
   Paper,
@@ -28,6 +29,7 @@ import { Link, useParams } from "react-router";
 import { participantApi } from "@/api/endpoints";
 import { errorMessage } from "@/api/errors";
 import type { JournalForMentor, ResponseDecision } from "@/api/types";
+import { useDesktop } from "@/components/DataTable";
 import { Screen } from "@/components/layout/Screen";
 import {
   Avatarish,
@@ -320,123 +322,186 @@ export function RespondPage() {
     queryFn: () => participantApi.journal(Number(id)),
   });
   const [tab, setTab] = useState<string | null>("isian");
+  const desktop = useDesktop();
   const d = query.data;
   return (
     <Screen
       title={d ? d.mentee.name : "Tanggapi lapbul"}
       subtitle={d ? `Lapbul ${monthLabel(d.journal.month)}` : undefined}
       back="/kelompok"
+      width="wide"
     >
       <Loadable query={query}>
-        {(data) => (
-          <Stack gap="lg">
-            <Paper p="lg">
-              <Group wrap="nowrap" align="flex-start">
-                <Avatarish name={data.mentee.name} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <Text fw={700}>{data.mentee.name}</Text>
-                  <Text size="xs" c="dimmed">
-                    {data.mentee.university} · {data.mentee.major} · T
-                    {data.mentee.tingkat}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    {CATEGORY_LABEL[data.mentee.category]} · KIP-K{" "}
-                    {data.mentee.kipK ? "ya" : "tidak"}
-                  </Text>
-                  <Group gap={6} mt={6}>
-                    <StatusBadge {...JOURNAL_STATUS[data.journal.status]} />
-                    {data.journal.isLate && (
-                      <StatusBadge label="Terlambat" tone="orange" />
-                    )}
-                  </Group>
-                </div>
-              </Group>
-              <Anchor
-                component={Link}
-                to={`/kelompok/mentee/${data.mentee.userId}`}
-                size="sm"
-                fw={600}
-                mt="sm"
-                display="block"
-              >
-                Lihat profil lengkap
-              </Anchor>
-            </Paper>
-            {data.journal.flag && data.journal.flag.status !== "resolved" && (
-              <FlagPanel data={data} />
-            )}
-            <Tabs value={tab} onChange={setTab} variant="pills" radius="md">
-              <Tabs.List grow>
-                <Tabs.Tab value="isian">Isian</Tabs.Tab>
-                <Tabs.Tab value="riwayat">Riwayat</Tabs.Tab>
-                <Tabs.Tab value="tanggapan">Tanggapi</Tabs.Tab>
-              </Tabs.List>
-              <Tabs.Panel value="isian" pt="md">
-                <JournalContent
-                  journal={data.journal}
-                  previousTargets={data.previousTargets}
-                  showSensitive
-                />
-                <Button
-                  fullWidth
-                  mt="md"
-                  onClick={() => {
-                    setTab("tanggapan");
-                    window.scrollTo({ top: 0 });
-                  }}
+        {(data) => {
+          const menteeCard = (
+            <>
+              <Paper p="lg">
+                <Group wrap="nowrap" align="flex-start">
+                  <Avatarish name={data.mentee.name} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <Text fw={700}>{data.mentee.name}</Text>
+                    <Text size="xs" c="dimmed">
+                      {data.mentee.university} · {data.mentee.major} · T
+                      {data.mentee.tingkat}
+                    </Text>
+                    <Text size="xs" c="dimmed">
+                      {CATEGORY_LABEL[data.mentee.category]} · KIP-K{" "}
+                      {data.mentee.kipK ? "ya" : "tidak"}
+                    </Text>
+                    <Group gap={6} mt={6}>
+                      <StatusBadge {...JOURNAL_STATUS[data.journal.status]} />
+                      {data.journal.isLate && (
+                        <StatusBadge label="Terlambat" tone="orange" />
+                      )}
+                    </Group>
+                  </div>
+                </Group>
+                <Anchor
+                  component={Link}
+                  to={`/kelompok/mentee/${data.mentee.userId}`}
+                  size="sm"
+                  fw={600}
+                  mt="sm"
+                  display="block"
                 >
-                  Tulis tanggapan
-                </Button>
-              </Tabs.Panel>
-              <Tabs.Panel value="riwayat" pt="md">
-                {data.history.length ? (
-                  <Stack gap="sm">
-                    {data.history.map((h) => (
-                      <Paper key={h.month} p="lg">
-                        <Group justify="space-between" mb="xs">
-                          <Title order={4}>{monthLabel(h.month)}</Title>
-                          <StatusBadge {...JOURNAL_STATUS[h.status]} />
-                        </Group>
-                        <PulseBars pulse={h.pulse} />
-                        {h.appreciation && (
-                          <>
-                            <Text size="xs" fw={700} c="dimmed" mt="sm">
-                              Apresiasi
-                            </Text>
-                            <MultilineText size="sm">
-                              {h.appreciation}
-                            </MultilineText>
-                          </>
-                        )}
-                        {h.responseText && (
-                          <>
-                            <Text size="xs" fw={700} c="dimmed" mt="xs">
-                              Tanggapan
-                            </Text>
-                            <MultilineText size="sm">
-                              {h.responseText}
-                            </MultilineText>
-                          </>
-                        )}
-                      </Paper>
-                    ))}
-                  </Stack>
-                ) : (
-                  <EmptyState
-                    title="Belum ada riwayat"
-                    description="Ini lapbul pertama mentee."
-                  />
-                )}
-              </Tabs.Panel>
-              <Tabs.Panel value="tanggapan" pt="md">
-                <ResponseForm
-                  key={data.journal.response?.respondedAt ?? "new"}
-                  data={data}
+                  Lihat profil lengkap
+                </Anchor>
+              </Paper>
+            </>
+          );
+          const flagPanel = (
+            <>
+              {data.journal.flag && data.journal.flag.status !== "resolved" && (
+                <FlagPanel data={data} />
+              )}
+            </>
+          );
+          const content = (
+            <>
+              <JournalContent
+                journal={data.journal}
+                previousTargets={data.previousTargets}
+                showSensitive
+              />
+            </>
+          );
+          const history = (
+            <>
+              {data.history.length ? (
+                <Stack gap="sm">
+                  {data.history.map((h) => (
+                    <Paper key={h.month} p="lg">
+                      <Group justify="space-between" mb="xs">
+                        <Title order={4}>{monthLabel(h.month)}</Title>
+                        <StatusBadge {...JOURNAL_STATUS[h.status]} />
+                      </Group>
+                      <PulseBars pulse={h.pulse} />
+                      {h.appreciation && (
+                        <>
+                          <Text size="xs" fw={700} c="dimmed" mt="sm">
+                            Apresiasi
+                          </Text>
+                          <MultilineText size="sm">
+                            {h.appreciation}
+                          </MultilineText>
+                        </>
+                      )}
+                      {h.responseText && (
+                        <>
+                          <Text size="xs" fw={700} c="dimmed" mt="xs">
+                            Tanggapan
+                          </Text>
+                          <MultilineText size="sm">
+                            {h.responseText}
+                          </MultilineText>
+                        </>
+                      )}
+                    </Paper>
+                  ))}
+                </Stack>
+              ) : (
+                <EmptyState
+                  title="Belum ada riwayat"
+                  description="Ini lapbul pertama mentee."
                 />
-              </Tabs.Panel>
-            </Tabs>
-          </Stack>
-        )}
+              )}
+            </>
+          );
+          const responseForm = (
+            <>
+              <ResponseForm
+                key={data.journal.response?.respondedAt ?? "new"}
+                data={data}
+              />
+            </>
+          );
+          if (desktop)
+            return (
+              <Grid gap="lg">
+                <Grid.Col span={7}>
+                  <Stack gap="lg">
+                    {menteeCard}
+                    <Tabs
+                      value={tab === "riwayat" ? "riwayat" : "isian"}
+                      onChange={setTab}
+                      variant="pills"
+                      radius="md"
+                    >
+                      <Tabs.List>
+                        <Tabs.Tab value="isian">Isian</Tabs.Tab>
+                        <Tabs.Tab value="riwayat">Riwayat</Tabs.Tab>
+                      </Tabs.List>
+                      <Tabs.Panel value="isian" pt="md">
+                        {content}
+                      </Tabs.Panel>
+                      <Tabs.Panel value="riwayat" pt="md">
+                        {history}
+                      </Tabs.Panel>
+                    </Tabs>
+                  </Stack>
+                </Grid.Col>
+                <Grid.Col span={5}>
+                  <Stack gap="lg" className="stickyAside stickyPane">
+                    {flagPanel}
+                    <Title order={3}>Tanggapan</Title>
+                    {responseForm}
+                  </Stack>
+                </Grid.Col>
+              </Grid>
+            );
+          return (
+            <Stack gap="lg">
+              {menteeCard}
+              {flagPanel}
+              <Tabs value={tab} onChange={setTab} variant="pills" radius="md">
+                <Tabs.List grow>
+                  <Tabs.Tab value="isian">Isian</Tabs.Tab>
+                  <Tabs.Tab value="riwayat">Riwayat</Tabs.Tab>
+                  <Tabs.Tab value="tanggapan">Tanggapi</Tabs.Tab>
+                </Tabs.List>
+                <Tabs.Panel value="isian" pt="md">
+                  {content}
+                  <Button
+                    fullWidth
+                    mt="md"
+                    onClick={() => {
+                      setTab("tanggapan");
+                      window.scrollTo({ top: 0 });
+                    }}
+                  >
+                    Tulis tanggapan
+                  </Button>
+                </Tabs.Panel>
+                <Tabs.Panel value="riwayat" pt="md">
+                  {history}
+                </Tabs.Panel>
+                <Tabs.Panel value="tanggapan" pt="md">
+                  {responseForm}
+                </Tabs.Panel>
+              </Tabs>
+            </Stack>
+          );
+        }}
       </Loadable>
     </Screen>
   );
