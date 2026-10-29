@@ -342,7 +342,6 @@ const mentees: MenteeSeed[] = [
     id: 15,
     mentor: null,
     category: "dasar",
-    status: "pending",
     hasAccount: false,
   },
   {
@@ -405,7 +404,6 @@ function participants(): Participant[] {
     const p = rows.get(Number(id)) ?? base(Number(id));
     p.isMentor = true;
     p.coordinatorUserId = coord;
-    if (Number(id) === 106) p.status = "reserve";
     rows.set(Number(id), p);
   }
   for (const id of [201, 202]) {

@@ -41,8 +41,6 @@ export const PARTICIPANT_STATUS: Record<
   { label: string; tone: Tone }
 > = {
   active: { label: "Aktif", tone: "green" },
-  pending: { label: "Menunggu keputusan", tone: "orange" },
-  reserve: { label: "Cadangan", tone: "violet" },
   inactive: { label: "Nonaktif", tone: "gray" },
 };
 

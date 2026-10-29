@@ -1,5 +1,4 @@
 import {
-  Alert,
   Button,
   Grid,
   Group,
@@ -257,11 +256,6 @@ export function MenteeHomePage() {
               </Grid>
             )}
           </Loadable>
-        )}
-        {me.participant.status === "pending" && (
-          <Alert color="yellow" variant="light">
-            Status kepesertaanmu masih menunggu keputusan pengelola.
-          </Alert>
         )}
       </Stack>
     </Screen>

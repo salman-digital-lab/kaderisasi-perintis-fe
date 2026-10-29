@@ -118,11 +118,13 @@ export function ParticipantsPage() {
   const [params, setParams] = useSearchParams();
   const role = params.get("role") ?? "";
   const status = params.get("status") ?? "";
+  const mentor = params.get("mentor") ?? "";
   const [q, setQ] = useState("");
   const [debounced] = useDebouncedValue(q, 250);
   const query = useQuery({
-    queryKey: ["staff", "participants", { role, status, q: debounced }],
-    queryFn: () => staffApi.participants({ role, status, q: debounced }),
+    queryKey: ["staff", "participants", { role, status, mentor, q: debounced }],
+    queryFn: () =>
+      staffApi.participants({ role, status, mentor, q: debounced }),
     placeholderData: (prev) => prev,
   });
   const setFilter = (key: string, value: string) => {
@@ -194,11 +196,11 @@ export function ParticipantsPage() {
             </Chip>
           </Group>
         </Chip.Group>
-        <Chip.Group
-          value={status}
-          onChange={(v) => setFilter("status", v as string)}
-        >
-          <Group gap={6} wrap="nowrap" className="hscroll">
+        <Group gap={6} wrap="nowrap" className="hscroll">
+          <Chip.Group
+            value={status}
+            onChange={(v) => setFilter("status", v as string)}
+          >
             <Chip value="" size="sm">
               Semua status
             </Chip>
@@ -207,8 +209,15 @@ export function ParticipantsPage() {
                 {v.label}
               </Chip>
             ))}
-          </Group>
-        </Chip.Group>
+          </Chip.Group>
+          <Chip
+            size="sm"
+            checked={mentor === "none"}
+            onChange={(on) => setFilter("mentor", on ? "none" : "")}
+          >
+            Tanpa mentor
+          </Chip>
+        </Group>
         <Loadable query={query}>
           {(rows) =>
             rows.length ? (

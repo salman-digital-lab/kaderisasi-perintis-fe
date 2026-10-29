@@ -241,7 +241,7 @@ function MentorModal({
           )
           .map((m) => ({
             value: String(m.userId),
-            label: `${m.name} · ${m.menteeCount} mentee${m.status === "reserve" ? " · cadangan" : ""}`,
+            label: `${m.name} · ${m.menteeCount} mentee`,
           }))}
         value={mentor}
         onChange={setMentor}
@@ -501,8 +501,7 @@ export function ParticipantDetailPage() {
                     </ListGroup>
                   ) : (
                     <Text size="sm" c="dimmed">
-                      Belum ada mentee
-                      {p.status === "reserve" ? " (mentor cadangan)" : ""}.
+                      Belum ada mentee.
                     </Text>
                   )}
                 </Section>

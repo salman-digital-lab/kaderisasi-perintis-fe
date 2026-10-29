@@ -224,11 +224,7 @@ route(
       indicators,
       byCoordinator,
       followupsOpen: followups().filter((f) => f.status === "open").length,
-      withoutMentor:
-        activeMentees().filter((m) => !m.mentorUserId).length +
-        db().participants.filter(
-          (p) => p.isMentee && p.status === "pending" && !p.mentorUserId,
-        ).length,
+      withoutMentor: activeMentees().filter((m) => !m.mentorUserId).length,
     };
   },
 );
@@ -375,9 +371,13 @@ route("admin", "GET", "/perintis/participants", ({ userId, query }) => {
   requirePermission(userId, "perintis.participants.read");
   const role = query.get("role");
   const status = query.get("status");
+  const noMentor = query.get("mentor") === "none";
   const q = query.get("q")?.toLowerCase().trim();
   return db()
-    .participants.map(rowOf)
+    .participants.filter(
+      (p) => !noMentor || (p.isMentee && p.mentorUserId == null),
+    )
+    .map(rowOf)
     .filter(
       (r) =>
         (!role || r.roles.includes(role as never)) &&
@@ -538,7 +538,6 @@ route<AddParticipantInput>(
       inactiveReason: null,
       hasAccount: body.userId !== 303,
     };
-    let reserveMentor: Participant | undefined;
     if (body.isMentee) {
       const nim = body.nim?.trim() || null;
       checkMenteeData(body.category);
@@ -548,15 +547,12 @@ route<AddParticipantInput>(
         nim,
         category: body.category || null,
         kipK: body.kipK,
-        status: "pending",
       });
       if (body.mentorUserId != null) {
         const m = rows.find((x) => x.userId === body.mentorUserId);
         if (!m || !m.isMentor || m.status === "inactive")
           throw new ApiError(422, "Mentor tidak valid.");
         p.mentorUserId = m.userId;
-        p.status = "active";
-        if (m.status === "reserve") reserveMentor = m;
       }
     }
     if (body.isMentor) {
@@ -566,9 +562,7 @@ route<AddParticipantInput>(
           throw new ApiError(422, "Koordinator tidak valid.");
         p.coordinatorUserId = c.userId;
       }
-      if (!body.isMentee && !body.isCoordinator) p.status = "reserve";
     }
-    if (reserveMentor) reserveMentor.status = "active";
     rows.push(p);
     return detail(p.userId);
   },
@@ -588,10 +582,8 @@ route<{ mentorUserId: number | null }>(
         throw new ApiError(422, "Mentor tidak valid.");
       if (m.userId === p.userId)
         throw new ApiError(422, "Mentee tidak bisa menjadi mentornya sendiri.");
-      if (m.status === "reserve") m.status = "active";
     }
     p.mentorUserId = body.mentorUserId;
-    if (p.status === "pending" && body.mentorUserId) p.status = "active";
     // The open month's journal moves with the mentee (PRD §8.7 no. 3).
     const month = currentReportMonth();
     const j = month ? findJournal(p.userId, month) : null;
@@ -614,8 +606,10 @@ route<{ status: ParticipantStatus; reason?: string }>(
           409,
           "Pindahkan dulu mentee mentor ini ke mentor lain.",
         );
-    } else {
+    } else if (body.status === "active") {
       p.inactiveReason = null;
+    } else {
+      throw new ApiError(422, "Status tidak dikenal.");
     }
     p.status = body.status;
     return detail(p.userId);

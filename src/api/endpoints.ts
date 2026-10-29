@@ -172,8 +172,12 @@ export const staffApi = {
     admin.get<FollowupItem[]>(`/perintis/followups${qs(filters)}`),
   resolveFollowup: (source: FollowupSource, id: number, note: string) =>
     admin.put(`/perintis/followups/${source}/${id}`, { note }),
-  participants: (filters: { role?: string; status?: string; q?: string }) =>
-    admin.get<ParticipantRow[]>(`/perintis/participants${qs(filters)}`),
+  participants: (filters: {
+    role?: string;
+    status?: string;
+    mentor?: string;
+    q?: string;
+  }) => admin.get<ParticipantRow[]>(`/perintis/participants${qs(filters)}`),
   participant: (id: number) =>
     admin.get<ParticipantDetail>(`/perintis/participants/${id}`),
   searchMembers: (q: string) =>

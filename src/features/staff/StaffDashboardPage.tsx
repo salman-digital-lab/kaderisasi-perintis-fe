@@ -201,7 +201,7 @@ export function StaffDashboardPage() {
                   label="Perlu tindak lanjut"
                 />
                 <StatTile
-                  to="/kelola/peserta?status=pending"
+                  to="/kelola/peserta?role=mentee&status=active&mentor=none"
                   icon={
                     <IconUserQuestion
                       size={20}

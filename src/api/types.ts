@@ -3,7 +3,7 @@ import type { JournalWindow } from "@/lib/time";
 export type Role = "mentee" | "mentor" | "coordinator";
 export type Category = "dasar" | "biaya_hidup";
 export type KaderisasiOverride = "lmd_lama" | "lmd_242" | "setara" | "belum";
-export type ParticipantStatus = "active" | "pending" | "reserve" | "inactive";
+export type ParticipantStatus = "active" | "inactive";
 export type CadreLevel = "Jamaah" | "Aktivis" | "Kader" | "Kader Lanjut";
 
 export interface Profile {
