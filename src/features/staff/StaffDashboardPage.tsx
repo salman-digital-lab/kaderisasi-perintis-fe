@@ -262,7 +262,8 @@ export function StaffDashboardPage() {
                     })}
                   </SimpleGrid>
                   <Text size="xs" c="dimmed" mt="lg">
-                    Sesi 0 dan kepuasan mentee dicatat di luar aplikasi.
+                    Mentee yang kategorinya belum diisi belum dihitung. Sesi 0
+                    dan kepuasan mentee dicatat di luar aplikasi.
                   </Text>
                 </Section>
               </Grid.Col>

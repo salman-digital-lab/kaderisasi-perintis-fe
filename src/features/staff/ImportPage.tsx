@@ -59,6 +59,10 @@ const RESULT = {
   error: { label: "Galat", tone: "red" },
 } as const;
 
+/** The row's cells, skipping empty ones (optional NIM, kategori, KIP-K). */
+const filledValues = (r: ImportPreviewRow) =>
+  r.values.filter(Boolean).join(" · ");
+
 const PREVIEW_COLUMNS: Column<ImportPreviewRow>[] = [
   {
     key: "line",
@@ -71,7 +75,7 @@ const PREVIEW_COLUMNS: Column<ImportPreviewRow>[] = [
     header: "Data",
     render: (r) => (
       <Text size="sm" fw={600} lineClamp={2}>
-        {r.values.join(" · ")}
+        {filledValues(r)}
       </Text>
     ),
   },
@@ -155,6 +159,8 @@ export function ImportPage() {
               <Title order={3}>1. Templat</Title>
               <Text size="sm" c="dimmed" mb="sm">
                 Kolom tetap: <code>{TEMPLATES[kind].csv.split("\n")[0]}</code>
+                {kind === "mentee" &&
+                  ". nim, kategori, dan kip_k boleh dikosongkan lalu dilengkapi lewat Ubah."}
               </Text>
               <Button
                 variant="light"
@@ -249,7 +255,7 @@ export function ImportPage() {
                           <StatusBadge {...RESULT[r.result]} />
                         </Group>
                         <Text size="sm" fw={600} truncate>
-                          {r.values.join(" · ")}
+                          {filledValues(r)}
                         </Text>
                         <Text
                           size="xs"

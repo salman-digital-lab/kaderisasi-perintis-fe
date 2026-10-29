@@ -30,6 +30,7 @@ import {
   deadlines,
   journalWindow,
   monthKey,
+  monthLabel,
   monthStart,
   now,
   nowIso,
@@ -442,24 +443,48 @@ route(
     escalateFlags();
     const month = query.get("month") ?? currentReportMonth();
     if (!month) throw new ApiError(404, "Belum ada bulan laporan.");
-    const rows: DashboardRow[] = menteesOf(userId).map((m) => {
-      const j = findJournal(m.userId, month);
-      const flagActive = j?.flag && j.flag.status !== "resolved";
+    // Lapbul answered here stay with this mentor after a move (PRD §8.7).
+    const current = menteesOf(userId);
+    const former = db()
+      .journals.filter(
+        (j) =>
+          j.month === month &&
+          j.mentorUserId === userId &&
+          j.status !== "draft" &&
+          !current.some((m) => m.userId === j.menteeUserId),
+      )
+      .map((j) => participant(j.menteeUserId));
+    const toRow = (
+      m: (typeof current)[number],
+      formerMentee: boolean,
+    ): DashboardRow => {
+      const found = findJournal(m.userId, month);
+      const own = found && found.mentorUserId === userId ? found : null;
+      const flagActive = own?.flag && own.flag.status !== "resolved";
       return {
         mentee: {
           ...person(m.userId)!,
           category: m.category ?? "",
           tingkat: tingkatOf(m.userId),
         },
-        journalId: j?.id ?? null,
-        status: j?.status ?? "not_started",
-        isLate: j?.isLate ?? false,
-        submittedAt: j?.submittedAt ?? null,
-        flag: flagActive && j?.flag ? { ...j.flag, journalId: j.id } : null,
-        inactiveStreak: inactiveStreak(m.userId, month),
+        journalId: own?.id ?? null,
+        status: found?.status ?? "not_started",
+        isLate: found?.isLate ?? false,
+        submittedAt: found?.submittedAt ?? null,
+        flag:
+          flagActive && own?.flag ? { ...own.flag, journalId: own.id } : null,
+        inactiveStreak: !formerMentee && inactiveStreak(m.userId, month),
+        heldBy:
+          found && !own && found.status !== "draft"
+            ? (person(found.mentorUserId)?.name ?? null)
+            : null,
+        formerMentee,
       };
-    });
-    // Journals of mentees that moved away mid-month still belong to this mentor.
+    };
+    const rows: DashboardRow[] = [
+      ...current.map((m) => toRow(m, false)),
+      ...former.map((m) => toRow(m, true)),
+    ];
     const rank = (r: DashboardRow) =>
       r.flag && (r.flag.status === "open" || r.flag.status === "escalated")
         ? 0
@@ -503,6 +528,8 @@ export function journalForReader(
   j: Journal,
   canRespond: boolean,
   reason: string | null,
+  /** The mentor reading it; their mentee may have moved to another group. */
+  mentorId?: number,
 ): JournalForMentor {
   const p = participant(j.menteeUserId);
   const prof = profile(j.menteeUserId);
@@ -520,6 +547,7 @@ export function journalForReader(
     history: history(j.menteeUserId, j.month),
     canRespond,
     respondLockedReason: reason,
+    movedAway: mentorId !== undefined && p.mentorUserId !== mentorId,
   };
 }
 
@@ -543,7 +571,7 @@ route("web", "GET", "/perintis/journals/:id", ({ userId, params }) => {
   escalateFlags();
   const j = mentorJournal(userId, Number(params.id));
   const lock = respondLock(j);
-  return journalForReader(j, !lock, lock);
+  return journalForReader(j, !lock, lock, userId);
 });
 
 route<RespondInput>(
@@ -578,7 +606,7 @@ route<RespondInput>(
     j.status = body.decision;
     if (body.decision === "flagged") j.followup = null;
     j.updatedAt = nowIso();
-    return journalForReader(j, true, null);
+    return journalForReader(j, true, null, userId);
   },
 );
 
@@ -596,7 +624,7 @@ route<{ note: string }>(
     j.flag.privateNote = note;
     // Escalated flags stay open for the pengelola to close.
     if (j.flag.status === "open") j.flag.status = "handled";
-    return journalForReader(j, !respondLock(j), respondLock(j));
+    return journalForReader(j, !respondLock(j), respondLock(j), userId);
   },
 );
 
@@ -691,6 +719,14 @@ route<SaveReportInput>(
   "PUT",
   "/perintis/reports/me/:month",
   ({ userId, params, body }) => {
+    if (
+      body.sessionDate &&
+      body.sessionDate.slice(0, 7) !== params.month.slice(0, 7)
+    )
+      throw new ApiError(
+        422,
+        `Tanggal sesi harus di bulan ${monthLabel(params.month)}.`,
+      );
     const r = ensureReport(userId, params.month);
     r.sessionDate = body.sessionDate || null;
     r.mode = body.mode;

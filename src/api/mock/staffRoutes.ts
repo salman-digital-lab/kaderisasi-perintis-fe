@@ -20,6 +20,8 @@ import type {
 } from "@/api/types";
 import {
   CATEGORY_LABEL,
+  PARTICIPANT_STATUS,
+  ROLE_LABEL,
   JOURNAL_STATUS,
   REPORT_STATUS,
 } from "@/content/labels";
@@ -145,12 +147,16 @@ route(
     const mentors = activeMentors();
     const reports = mentors.map((m) => findReport(m.userId, month));
     const flags = journals.filter((j) => j.flag);
+    // Mentees without kategori cannot start a lapbul, so they are not counted.
+    const expected = mentees.filter(
+      (m) => m.category || journals.some((j) => j.menteeUserId === m.userId),
+    );
     const indicators = [
       pct(
         "ontime",
         "Lapbul terkirim tepat waktu",
         submitted.filter((j) => !j.isLate).length,
-        mentees.length,
+        expected.length,
         0.85,
       ),
       pct(
@@ -725,16 +731,22 @@ function preview(kind: ImportKind, csv: string): ImportPreview {
     if (values.length !== columns.length)
       return row("error", "Jumlah kolom tidak sesuai.");
     if (kind === "mentee") {
-      const [nim, , email, kategori, kip] = values;
-      if (seen.has(nim))
+      // NIM, kategori and KIP-K may be empty and filled in later.
+      const [nim, nama, email, kategori, kip] = values;
+      if (nim && seen.has(nim))
         return row("error", `NIM ganda dengan baris ${seen.get(nim)}`);
-      seen.set(nim, line);
-      if (!["dasar", "biaya_hidup"].includes(kategori))
+      if (nim) seen.set(nim, line);
+      if (!nama || !email.includes("@"))
+        return row("error", "Nama dan email wajib diisi");
+      if (nim.length > 30) return row("error", "NIM paling banyak 30 karakter");
+      if (kategori && !["dasar", "biaya_hidup"].includes(kategori))
         return row("error", `Kategori tidak dikenal: ${kategori}`);
-      if (!["ya", "tidak"].includes(kip.toLowerCase()))
-        return row("error", "kip_k harus ya/tidak");
+      if (kip && !["ya", "tidak"].includes(kip.toLowerCase()))
+        return row("error", "kip_k harus ya/tidak atau dikosongkan");
       const prof = byEmail(email);
-      const nimOwner = db().participants.find((p) => p.nim === nim);
+      const nimOwner = nim
+        ? db().participants.find((p) => p.nim === nim)
+        : undefined;
       if (nimOwner && nimOwner.userId !== prof?.userId)
         return row("error", "NIM sudah dipakai peserta lain");
       if (!prof) return row("new", "Baru · akun belum aktif (no_account)");
@@ -853,12 +865,11 @@ route<{ kind: ImportKind; csv: string }>(
       if (body.kind === "mentee") {
         const [nim, nama, email, kategori, kip] = r.values;
         const p = ensureParticipant(ensureUser(email, nama));
-        Object.assign(p, {
-          isMentee: true,
-          nim,
-          category: kategori as Category,
-          kipK: kip.toLowerCase() === "ya",
-        });
+        // An empty cell keeps what is stored.
+        p.isMentee = true;
+        if (nim) p.nim = nim;
+        if (kategori) p.category = kategori as Category;
+        if (kip) p.kipK = kip.toLowerCase() === "ya";
       } else if (body.kind === "mentor") {
         const [email, coordEmail] = r.values;
         const p = ensureParticipant(ensureUser(email, email.split("@")[0]));
@@ -940,7 +951,7 @@ route(
           prof.name,
           prof.university,
           prof.major,
-          prof.intakeYear,
+          prof.intakeYear || "",
           p.kipK,
           p.category ? CATEGORY_LABEL[p.category] : "",
           person(p.mentorUserId)?.name ?? "",
@@ -1055,14 +1066,14 @@ route(
           r.name,
           r.email,
           r.nim,
-          r.roles.join("+"),
+          r.roles.map((role) => ROLE_LABEL[role]).join(" + "),
           r.category ? CATEGORY_LABEL[r.category] : "",
           r.university,
           r.tingkat,
           r.mentorName,
           r.coordinatorName,
           r.menteeCount,
-          r.status,
+          PARTICIPANT_STATUS[r.status].label,
         ]);
     } else {
       throw new ApiError(404, "Jenis ekspor tidak dikenal.");

@@ -228,8 +228,11 @@ export function markers(userId: number): Markers {
   if (p.isMentee) {
     const j = findJournal(userId, month);
     const window = journalWindow(month);
+    // Without kategori the lapbul cannot be started yet.
+    const canStart = !!j || !!p.category;
     result.lapbulPending =
-      (window !== "upcoming" &&
+      (canStart &&
+        window !== "upcoming" &&
         window !== "locked" &&
         (!j || j.status === "draft")) ||
       j?.status === "revision_requested";

@@ -117,8 +117,13 @@ function ReportForm({ detail }: { detail: ReportDetail }) {
       }),
   });
 
+  // Typed dates can fall outside min/max, so check the month too.
+  const dateOutside =
+    !!form.sessionDate &&
+    (form.sessionDate < minDate || form.sessionDate > maxDate);
   const ready =
     !!form.sessionDate &&
+    !dateOutside &&
     form.photos.length > 0 &&
     !!form.summary.trim() &&
     !!form.locationOrLink.trim();
@@ -138,6 +143,11 @@ function ReportForm({ detail }: { detail: ReportDetail }) {
             value={form.sessionDate ?? ""}
             onChange={(e) =>
               set({ sessionDate: e.currentTarget.value || null })
+            }
+            error={
+              dateOutside
+                ? `Tanggal sesi harus di bulan ${monthLabel(month)}.`
+                : undefined
             }
           />
           <div>

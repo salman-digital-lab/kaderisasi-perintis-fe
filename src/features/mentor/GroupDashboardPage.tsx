@@ -104,6 +104,17 @@ const rowTarget = (r: DashboardRow) =>
     ? `/kelompok/lapbul/${r.journalId}`
     : `/kelompok/mentee/${r.mentee.userId}`;
 
+/** Tingkat and kategori, plus where a moved mentee's lapbul lives. */
+const rowDetail = (r: DashboardRow) =>
+  [
+    `T${r.mentee.tingkat}`,
+    categoryLabel(r.mentee.category),
+    r.formerMentee && "Sudah pindah kelompok",
+    r.heldBy && `Lapbul bulan ini ditanggapi ${r.heldBy}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
 const COLUMNS: Column<DashboardRow>[] = [
   {
     key: "name",
@@ -123,7 +134,7 @@ const COLUMNS: Column<DashboardRow>[] = [
             {r.mentee.name}
           </Anchor>
           <Text size="xs" c="dimmed">
-            T{r.mentee.tingkat} · {categoryLabel(r.mentee.category)}
+            {rowDetail(r)}
           </Text>
         </div>
       </Group>
@@ -225,7 +236,8 @@ export function GroupDashboardPage() {
           <DisplayTitle>Kelompok saya</DisplayTitle>
           {query.data && (
             <Text size="sm" fw={600} opacity={0.92}>
-              Tingkat {query.data.tingkat} · {query.data.rows.length} mentee
+              Tingkat {query.data.tingkat} ·{" "}
+              {query.data.rows.filter((r) => !r.formerMentee).length} mentee
             </Text>
           )}
         </Stack>
@@ -310,8 +322,7 @@ export function GroupDashboardPage() {
                             description={
                               <Stack gap={4}>
                                 <Text size="xs" c="dimmed">
-                                  T{r.mentee.tingkat} ·{" "}
-                                  {categoryLabel(r.mentee.category)}
+                                  {rowDetail(r)}
                                 </Text>
                                 <Group gap={6}>
                                   <StatusBadge {...JOURNAL_STATUS[r.status]} />

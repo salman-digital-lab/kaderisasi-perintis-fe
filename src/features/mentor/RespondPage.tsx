@@ -356,16 +356,23 @@ export function RespondPage() {
                     </Group>
                   </div>
                 </Group>
-                <Anchor
-                  component={Link}
-                  to={`/kelompok/mentee/${data.mentee.userId}`}
-                  size="sm"
-                  fw={600}
-                  mt="sm"
-                  display="block"
-                >
-                  Lihat profil lengkap
-                </Anchor>
+                {data.movedAway ? (
+                  <Text size="sm" c="dimmed" mt="sm">
+                    Mentee ini sudah pindah kelompok. Lapbul ini tetap tercatat
+                    atas namamu.
+                  </Text>
+                ) : (
+                  <Anchor
+                    component={Link}
+                    to={`/kelompok/mentee/${data.mentee.userId}`}
+                    size="sm"
+                    fw={600}
+                    mt="sm"
+                    display="block"
+                  >
+                    Lihat profil lengkap
+                  </Anchor>
+                )}
               </Paper>
             </>
           );

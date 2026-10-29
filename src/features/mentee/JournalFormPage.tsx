@@ -189,6 +189,10 @@ function Wizard({ detail }: { detail: JournalDetail }) {
   );
   const revision = useRef(detail.journal?.revision ?? 0);
   const dirty = useRef(false);
+  /** Counts edits, so a save only clears `dirty` when nothing changed meanwhile. */
+  const edits = useRef(0);
+  /** The save in flight; saves run one at a time so each sends the latest revision. */
+  const inflight = useRef<Promise<unknown> | null>(null);
   const formRef = useRef(form);
   useEffect(() => {
     formRef.current = form;
@@ -214,6 +218,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
       return next;
     });
     dirty.current = true;
+    edits.current += 1;
   };
   const setAnswers = (patch: Partial<JournalAnswers>) =>
     update((f) => ({ ...f, answers: { ...f.answers, ...patch } }));
@@ -237,7 +242,6 @@ function Wizard({ detail }: { detail: JournalDetail }) {
         honestyConfirmed: honesty,
       }),
     onSuccess: (next) => {
-      dirty.current = false;
       applyDetail(next);
       try {
         localStorage.removeItem(backupKey(me.profile.userId, month));
@@ -256,21 +260,46 @@ function Wizard({ detail }: { detail: JournalDetail }) {
   });
 
   const { mutateAsync: saveAsync, isPending: saving } = saveMutation;
+  /**
+   * Runs one draft request at a time. Saves, uploads and deletions each bump
+   * the draft's revision, so two at once would carry the same revision and
+   * the second would be rejected as an edit from another device.
+   */
+  const exclusive = useCallback(async <T,>(run: () => Promise<T>) => {
+    while (inflight.current) await inflight.current.catch(() => {});
+    const request = run();
+    inflight.current = request;
+    try {
+      return await request;
+    } finally {
+      if (inflight.current === request) inflight.current = null;
+    }
+  }, []);
+  /** Keeps the revision current as soon as a response arrives. */
+  const track = (next: JournalDetail | null) => {
+    if (next?.journal) revision.current = next.journal.revision;
+    return next;
+  };
+
   const save = useCallback(
     async (force = false) => {
-      if (!dirty.current && !force) return;
-      await saveAsync();
+      await exclusive(async () => {
+        if (!dirty.current && !force) return;
+        const seen = edits.current;
+        await saveAsync();
+        if (edits.current === seen) dirty.current = false;
+      });
     },
-    [saveAsync],
+    [exclusive, saveAsync],
   );
 
   useEffect(() => {
     if (!started) return;
     const t = setInterval(() => {
-      if (dirty.current && !saving) save().catch(() => {});
+      if (dirty.current && !inflight.current) save().catch(() => {});
     }, AUTOSAVE_MS);
     return () => clearInterval(t);
-  }, [started, save, saving]);
+  }, [started, save]);
 
   const upload = useMutation({
     mutationFn: async ({
@@ -279,19 +308,22 @@ function Wizard({ detail }: { detail: JournalDetail }) {
     }: {
       field: "s3b" | "s7khs";
       files: File[];
-    }) => {
-      let last: JournalDetail | null = null;
-      for (const file of files) {
-        if (file.size > 5 * 1024 * 1024 && !file.type.startsWith("image/"))
-          throw new ApiError(413, `${file.name}: ukuran maksimal 5 MB.`);
-        last = await participantApi.uploadJournalFile(
-          month,
-          field,
-          await toPayload(file),
-        );
-      }
-      return last;
-    },
+    }) =>
+      exclusive(async () => {
+        let last: JournalDetail | null = null;
+        for (const file of files) {
+          if (file.size > 5 * 1024 * 1024 && !file.type.startsWith("image/"))
+            throw new ApiError(413, `${file.name}: ukuran maksimal 5 MB.`);
+          last = track(
+            await participantApi.uploadJournalFile(
+              month,
+              field,
+              await toPayload(file),
+            ),
+          );
+        }
+        return last;
+      }),
     onSuccess: (next) => {
       if (!next?.journal) return;
       applyDetail(next);
@@ -306,7 +338,10 @@ function Wizard({ detail }: { detail: JournalDetail }) {
   });
 
   const removeFile = useMutation({
-    mutationFn: (key: string) => participantApi.deleteJournalFile(month, key),
+    mutationFn: (key: string) =>
+      exclusive(async () =>
+        track(await participantApi.deleteJournalFile(month, key))!,
+      ),
     onSuccess: (next) => {
       applyDetail(next);
       setForm((f) => ({ ...f, files: next.journal?.files ?? [] }));
@@ -316,7 +351,7 @@ function Wizard({ detail }: { detail: JournalDetail }) {
   const submit = useMutation({
     mutationFn: async () => {
       await save(true);
-      return participantApi.submitJournal(month);
+      return exclusive(() => participantApi.submitJournal(month));
     },
     onSuccess: (next) => {
       queryClient.setQueryData(["p", "journal", month], next);

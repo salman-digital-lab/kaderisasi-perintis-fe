@@ -128,6 +128,7 @@ function EditModal({
         <>
           <TextInput
             label="NIM"
+            description="Opsional."
             inputMode="numeric"
             autoComplete="off"
             value={form.nim ?? ""}
@@ -135,15 +136,19 @@ function EditModal({
           />
           <Select
             label="Kategori"
+            description="Opsional, tapi mentee baru bisa mengisi Catatan Perjalanan setelah kategori diisi."
+            clearable
             data={Object.entries(CATEGORY_LABEL).map(([value, label]) => ({
               value,
               label,
             }))}
             value={form.category}
-            onChange={(v) => set({ category: v as Category })}
+            onChange={(v) => set({ category: v as Category | null })}
           />
           <Select
             label="KIP-K"
+            description="Opsional."
+            clearable
             data={[
               { value: "ya", label: "Ya" },
               { value: "tidak", label: "Tidak" },

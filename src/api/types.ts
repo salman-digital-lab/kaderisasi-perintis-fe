@@ -268,6 +268,10 @@ export interface DashboardRow {
   submittedAt: string | null;
   flag: (JournalFlag & { journalId: number }) | null;
   inactiveStreak: boolean;
+  /** The mentor who answered this month's lapbul before the mentee moved here. */
+  heldBy: string | null;
+  /** Moved to another mentor; only this month's lapbul answered here remains. */
+  formerMentee: boolean;
 }
 
 export interface MentorDashboard {
@@ -298,6 +302,8 @@ export interface JournalForMentor {
   history: HistoryItem[];
   canRespond: boolean;
   respondLockedReason: string | null;
+  /** The mentee has since moved to another mentor; their profile is no longer shown. */
+  movedAway: boolean;
 }
 
 export type ResponseDecision = "accepted" | "revision_requested" | "flagged";
