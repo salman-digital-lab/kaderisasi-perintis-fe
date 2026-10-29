@@ -52,6 +52,8 @@ import {
   ROLE_LABEL,
 } from "@/content/labels";
 import { monthLabel } from "@/lib/time";
+import { useAuth } from "@/auth/AuthProvider";
+import { MANAGE_PERMISSION, ProfileSection } from "./MemberProfile";
 
 type ModalKind = "edit" | "mentor" | "status" | null;
 
@@ -363,6 +365,8 @@ export function ParticipantDetailPage() {
   });
   const close = () => setModal(null);
   const desktop = useDesktop();
+  const { staff } = useAuth();
+  const canEdit = !!staff?.permissions.includes(MANAGE_PERMISSION);
 
   return (
     <Screen
@@ -589,6 +593,7 @@ export function ParticipantDetailPage() {
                       {menteeData}
                       {!p.isMentee && groups}
                       {journals}
+                      <ProfileSection userId={p.userId} canEdit={canEdit} />
                     </Stack>
                   </Grid.Col>
                 </Grid>
@@ -599,6 +604,7 @@ export function ParticipantDetailPage() {
                   {menteeData}
                   {groups}
                   {journals}
+                  <ProfileSection userId={p.userId} canEdit={canEdit} />
                 </Stack>
               )}
               <Modal

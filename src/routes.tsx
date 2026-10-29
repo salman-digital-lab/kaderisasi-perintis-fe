@@ -52,6 +52,7 @@ import { AddParticipantPage } from "@/features/staff/AddParticipantPage";
 import { FollowupsPage } from "@/features/staff/FollowupsPage";
 import { ImportPage } from "@/features/staff/ImportPage";
 import { ParticipantDetailPage } from "@/features/staff/ParticipantDetailPage";
+import { ProfileEditPage } from "@/features/staff/MemberProfile";
 import { ParticipantsPage } from "@/features/staff/ParticipantsPage";
 import { StaffDashboardPage } from "@/features/staff/StaffDashboardPage";
 import { StaffJournalPage } from "@/features/staff/StaffJournalPage";
@@ -328,6 +329,7 @@ export function AppRoutes() {
           <Route path="peserta" element={<ParticipantsPage />} />
           <Route path="peserta/tambah" element={<AddParticipantPage />} />
           <Route path="peserta/:userId" element={<ParticipantDetailPage />} />
+          <Route path="peserta/:userId/profil" element={<ProfileEditPage />} />
           <Route path="lapbul/:id" element={<StaffJournalPage />} />
           <Route path="impor" element={<ImportPage />} />
           <Route path="akun" element={<StaffAccountPage />} />

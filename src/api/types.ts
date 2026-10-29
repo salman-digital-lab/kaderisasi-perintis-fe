@@ -495,6 +495,8 @@ export interface ParticipantRow {
   kipK: boolean | null;
   university: string;
   tingkat: number;
+  /** WhatsApp from the kaderisasi profile. */
+  phone: string | null;
   mentorName: string | null;
   coordinatorName: string | null;
   menteeCount: number;
@@ -577,3 +579,76 @@ export type ExportKind =
   | "status-lapbul"
   | "laporan-mentoring"
   | "data-peserta";
+
+// ---- Profil kaderisasi (same shape as the admin member page, /v2/profiles) ----
+
+export type Degree =
+  "high_school" | "diploma" | "bachelor" | "master" | "doctoral";
+
+export interface EducationEntry {
+  degree?: Degree;
+  institution: string;
+  faculty: string;
+  major: string;
+  intake_year?: number;
+}
+
+export interface WorkEntry {
+  job_title: string;
+  company: string;
+  start_year?: number;
+  end_year?: number;
+}
+
+/** A participant's kaderisasi profile (snake_case, as the admin API serves it). */
+export interface KaderisasiProfile {
+  id: number;
+  user_id: number;
+  name: string;
+  gender: "M" | "F" | null;
+  personal_id: string | null;
+  birth_date: string | null;
+  whatsapp: string | null;
+  line: string | null;
+  instagram: string | null;
+  tiktok: string | null;
+  linkedin: string | null;
+  province_id: number | null;
+  city_id: number | null;
+  country: string | null;
+  origin_province_id: number | null;
+  origin_city_id: number | null;
+  level: number | null;
+  badges: string[];
+  education_history: EducationEntry[];
+  work_history: WorkEntry[];
+  province: { id: number; name: string } | null;
+  city: { id: number; name: string } | null;
+}
+
+/** Body of `PUT /perintis/participants/{id}/profile` (absent fields keep their value). */
+export interface KaderisasiProfileInput {
+  name?: string;
+  gender?: "M" | "F";
+  personal_id?: string;
+  birth_date?: string;
+  whatsapp?: string;
+  line?: string;
+  instagram?: string;
+  tiktok?: string;
+  linkedin?: string;
+  province_id?: number;
+  city_id?: number;
+  country?: string;
+  origin_province_id?: number;
+  origin_city_id?: number;
+  level?: number;
+  badges?: string[];
+  education_history?: EducationEntry[];
+  work_history?: WorkEntry[];
+}
+
+export interface CatalogItem {
+  id: number;
+  name: string;
+}

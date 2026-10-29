@@ -17,6 +17,8 @@ import type {
   ParticipantStatus,
   StaffDashboard,
   UpdateParticipantInput,
+  KaderisasiProfile,
+  KaderisasiProfileInput,
 } from "@/api/types";
 import {
   CATEGORY_LABEL,
@@ -355,6 +357,7 @@ function rowOf(p: Participant): ParticipantRow {
     kipK: p.kipK,
     university: prof.university,
     tingkat: tingkatOf(p.userId),
+    phone: prof.phone && prof.phone !== "-" ? prof.phone : null,
     mentorName: person(p.mentorUserId)?.name ?? null,
     coordinatorName:
       person(
@@ -406,6 +409,157 @@ route("admin", "GET", "/perintis/participants/:id", ({ userId, params }) => {
   requirePermission(userId, "perintis.participants.read");
   return detail(Number(params.id));
 });
+
+// ---- profil kaderisasi + public reference lists ----
+
+const PUBLIC = { isPublic: true };
+
+const MOCK_PROVINCES = [
+  { id: 32, name: "Jawa Barat" },
+  { id: 31, name: "DKI Jakarta" },
+  { id: 33, name: "Jawa Tengah" },
+];
+const MOCK_CITIES: Record<number, { id: number; name: string }[]> = {
+  32: [
+    { id: 3273, name: "Kota Bandung" },
+    { id: 3204, name: "Kabupaten Bandung" },
+    { id: 3277, name: "Kota Cimahi" },
+  ],
+  31: [{ id: 3171, name: "Kota Jakarta Selatan" }],
+  33: [{ id: 3374, name: "Kota Semarang" }],
+};
+const MOCK_UNIVERSITIES = [
+  "Institut Teknologi Bandung",
+  "Universitas Padjadjaran",
+  "Universitas Pendidikan Indonesia",
+  "Universitas Islam Bandung",
+  "Telkom University",
+];
+const LEVEL_VALUE: Record<string, number> = {
+  Jamaah: 0,
+  Aktivis: 3,
+  Kader: 6,
+  "Kader Lanjut": 10,
+};
+
+function kaderisasiProfile(id: number): KaderisasiProfile {
+  const store = (db().kaderisasi ??= {});
+  if (!store[id]) {
+    const p = profile(id);
+    store[id] = {
+      id: 1000 + id,
+      user_id: id,
+      name: p.name,
+      gender: p.gender === "P" ? "F" : "M",
+      personal_id: null,
+      birth_date: null,
+      whatsapp: p.phone && p.phone !== "-" ? p.phone : null,
+      line: null,
+      instagram: p.instagram,
+      tiktok: null,
+      linkedin: p.linkedin,
+      province_id: 32,
+      city_id: 3273,
+      country: "Indonesia",
+      origin_province_id: null,
+      origin_city_id: null,
+      level: LEVEL_VALUE[p.level] ?? 0,
+      badges: [],
+      education_history: p.university
+        ? [
+            {
+              degree: "bachelor",
+              institution: p.university,
+              faculty: "",
+              major: p.major,
+              intake_year: p.intakeYear || undefined,
+            },
+          ]
+        : [],
+      work_history: [],
+      province: null,
+      city: null,
+    };
+  }
+  const k = store[id];
+  k.province = MOCK_PROVINCES.find((x) => x.id === k.province_id) ?? null;
+  k.city =
+    (MOCK_CITIES[k.province_id ?? 0] ?? []).find((x) => x.id === k.city_id) ??
+    null;
+  return k;
+}
+
+route(
+  "admin",
+  "GET",
+  "/perintis/participants/:id/profile",
+  ({ userId, params }) => {
+    requirePermission(userId, "perintis.participants.read");
+    const id = Number(params.id);
+    participant(id);
+    return { profile: kaderisasiProfile(id) };
+  },
+);
+
+route<KaderisasiProfileInput>(
+  "admin",
+  "PUT",
+  "/perintis/participants/:id/profile",
+  ({ userId, params, body }) => {
+    requirePermission(userId, "perintis.participants.manage");
+    const id = Number(params.id);
+    participant(id);
+    const k = kaderisasiProfile(id);
+    // Absent fields keep their value, as in the admin member API.
+    for (const [key, value] of Object.entries(body))
+      if (value !== undefined)
+        (k as unknown as Record<string, unknown>)[key] = value;
+    // Keep the summary the rest of the app reads in step.
+    const p = profile(id);
+    p.name = k.name;
+    p.gender = k.gender === "F" ? "P" : "L";
+    p.phone = k.whatsapp ?? "-";
+    p.instagram = k.instagram;
+    p.linkedin = k.linkedin;
+    const last = k.education_history[k.education_history.length - 1];
+    if (last) {
+      p.university = last.institution || p.university;
+      p.major = last.major || p.major;
+      p.intakeYear = last.intake_year ?? p.intakeYear;
+    }
+    return { profile: kaderisasiProfile(id) };
+  },
+);
+
+route("admin", "GET", "/provinces", () => MOCK_PROVINCES, PUBLIC);
+route(
+  "admin",
+  "GET",
+  "/provinces/:id/cities",
+  ({ params }) => MOCK_CITIES[Number(params.id)] ?? [],
+  PUBLIC,
+);
+route(
+  "admin",
+  "GET",
+  "/countries",
+  () => [{ name: "Indonesia" }, { name: "Malaysia" }],
+  PUBLIC,
+);
+route(
+  "admin",
+  "GET",
+  "/universities",
+  ({ query }) => {
+    const q = (query.get("search") ?? "").toLowerCase();
+    return {
+      data: MOCK_UNIVERSITIES.filter((u) => u.toLowerCase().includes(q)).map(
+        (name, i) => ({ id: i + 1, name }),
+      ),
+    };
+  },
+  PUBLIC,
+);
 
 route<UpdateParticipantInput>(
   "admin",

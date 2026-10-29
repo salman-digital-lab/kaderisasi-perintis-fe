@@ -27,6 +27,9 @@ import type {
   StaffUser,
   UpdateParticipantInput,
   UploadedFile,
+  KaderisasiProfile,
+  KaderisasiProfileInput,
+  CatalogItem,
 } from "./types";
 
 const qs = (params: Record<string, string | null | undefined>) => {
@@ -180,6 +183,15 @@ export const staffApi = {
   }) => admin.get<ParticipantRow[]>(`/perintis/participants${qs(filters)}`),
   participant: (id: number) =>
     admin.get<ParticipantDetail>(`/perintis/participants/${id}`),
+  participantProfile: (id: number) =>
+    admin.get<{ profile: KaderisasiProfile | null }>(
+      `/perintis/participants/${id}/profile`,
+    ),
+  updateParticipantProfile: (id: number, input: KaderisasiProfileInput) =>
+    admin.put<{ profile: KaderisasiProfile | null }>(
+      `/perintis/participants/${id}/profile`,
+      input,
+    ),
   searchMembers: (q: string) =>
     admin.get<MemberCandidate[]>(`/perintis/members${qs({ q })}`),
   addParticipant: (input: AddParticipantInput) =>
@@ -207,4 +219,18 @@ export const staffApi = {
     admin.get<{ filename: string; csv: string }>(
       `/perintis/exports/${kind}${qs({ month })}`,
     ),
+};
+
+/** Public reference lists of the admin API (no permission needed). */
+export const catalogApi = {
+  provinces: () => admin.get<CatalogItem[]>("/provinces"),
+  cities: (provinceId: number) =>
+    admin.get<CatalogItem[]>(`/provinces/${provinceId}/cities`),
+  countries: () => admin.get<{ name: string }[]>("/countries"),
+  universities: async (search: string) =>
+    (
+      await admin.get<{ data: CatalogItem[] }>(
+        `/universities${qs({ search, page: "1", per_page: "20" })}`,
+      )
+    ).data,
 };

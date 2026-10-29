@@ -1,6 +1,7 @@
 import type {
   Achievement,
   ActivityItem,
+  KaderisasiProfile,
   Category,
   ClubItem,
   Followup,
@@ -28,6 +29,8 @@ export interface MockDb {
   reports: StoredReport[];
   staff: StaffUser[];
   seq: { journal: number; report: number; file: number; user: number };
+  /** Full kaderisasi profiles edited by the pengelola (filled on first use). */
+  kaderisasi?: Record<number, KaderisasiProfile>;
 }
 
 export const DB_VERSION = 2;

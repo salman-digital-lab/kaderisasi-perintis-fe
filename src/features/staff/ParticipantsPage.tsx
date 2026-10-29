@@ -26,10 +26,17 @@ import {
   StatusBadge,
 } from "@/components/ui";
 import {
+  CATEGORY_LABEL,
   menteeDataMissing,
   PARTICIPANT_STATUS,
   ROLE_LABEL,
 } from "@/content/labels";
+
+/** wa.me link for an Indonesian number (08… → 628…). */
+function waLink(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  return `https://wa.me/${digits.startsWith("0") ? `62${digits.slice(1)}` : digits}`;
+}
 
 function Badges({ r }: { r: ParticipantRow }) {
   return (
@@ -86,22 +93,71 @@ const COLUMNS: Column<ParticipantRow>[] = [
     render: (r) => r.nim ?? "—",
   },
   {
+    key: "campus",
+    header: "Kampus · Tingkat",
+    sortValue: (r) => r.university,
+    render: (r) => (
+      <Text size="sm" lineClamp={2}>
+        {r.university || "—"}
+        {r.university ? ` · T${r.tingkat}` : ""}
+      </Text>
+    ),
+  },
+  {
+    key: "category",
+    header: "Kategori · KIP-K",
+    sortValue: (r) => r.category ?? "",
+    render: (r) =>
+      r.roles.includes("mentee")
+        ? [
+            r.category ? CATEGORY_LABEL[r.category] : "—",
+            r.kipK == null ? null : r.kipK ? "KIP-K" : "Non KIP-K",
+          ]
+            .filter(Boolean)
+            .join(" · ")
+        : "—",
+  },
+  {
+    key: "phone",
+    header: "WhatsApp",
+    nowrap: true,
+    sortValue: (r) => r.phone ?? "",
+    render: (r) =>
+      r.phone ? (
+        <Anchor
+          href={waLink(r.phone)}
+          target="_blank"
+          rel="noreferrer"
+          size="sm"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {r.phone}
+        </Anchor>
+      ) : (
+        "—"
+      ),
+  },
+  {
     key: "group",
     header: "Mentor / kelompok",
     sortValue: (r) => r.mentorName ?? "",
-    render: (r) =>
-      [
-        r.roles.includes("mentee") ? `Mentor ${r.mentorName ?? "—"}` : "",
-        r.roles.includes("mentor") ? `${r.menteeCount} mentee` : "",
-      ]
-        .filter(Boolean)
-        .join(" · ") || "—",
-  },
-  {
-    key: "coordinator",
-    header: "Koordinator",
-    sortValue: (r) => r.coordinatorName ?? "",
-    render: (r) => r.coordinatorName ?? "—",
+    render: (r) => (
+      <div>
+        <Text size="sm">
+          {[
+            r.roles.includes("mentee") ? `Mentor ${r.mentorName ?? "—"}` : "",
+            r.roles.includes("mentor") ? `${r.menteeCount} mentee` : "",
+          ]
+            .filter(Boolean)
+            .join(" · ") || "—"}
+        </Text>
+        {r.coordinatorName && (
+          <Text size="xs" c="dimmed">
+            Koord. {r.coordinatorName}
+          </Text>
+        )}
+      </div>
+    ),
   },
   {
     key: "status",
@@ -231,6 +287,7 @@ export function ParticipantsPage() {
                     rows={rows}
                     rowKey={(r) => r.userId}
                     rowHref={(r) => `/kelola/peserta/${r.userId}`}
+                    minWidth={1100}
                   />
                 ) : (
                   <ListGroup>
@@ -242,6 +299,12 @@ export function ParticipantsPage() {
                         title={r.name}
                         description={
                           <Stack gap={4}>
+                            {r.university && (
+                              <Text size="xs" c="dimmed" lineClamp={1}>
+                                {r.university} · T{r.tingkat}
+                                {r.phone ? ` · ${r.phone}` : ""}
+                              </Text>
+                            )}
                             <Text size="xs" c="dimmed" lineClamp={1}>
                               {r.roles.map((x) => ROLE_LABEL[x]).join(" + ")}
                               {r.nim ? ` · ${r.nim}` : ""}
