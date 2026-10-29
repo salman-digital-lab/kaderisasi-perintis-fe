@@ -10,8 +10,8 @@ dayjs.locale("id");
 
 export const TZ = "Asia/Jakarta";
 
-/** First reporting month of the program (opens 1 Nov 2026). */
-export const FIRST_MONTH = "2026-10-01";
+/** First reporting month of the program (opens 1 Oct 2026). */
+export const FIRST_MONTH = "2026-09-01";
 
 const CLOCK_KEY = "perintis.mock.now";
 

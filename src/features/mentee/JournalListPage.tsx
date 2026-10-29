@@ -56,7 +56,7 @@ export function JournalListPage() {
           ) : (
             <EmptyState
               title="Belum ada bulan laporan"
-              description="Catatan Perjalanan Oktober 2026 dibuka 1 November 2026."
+              description="Catatan Perjalanan September 2026 dibuka 1 Oktober 2026."
             />
           )
         }

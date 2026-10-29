@@ -218,7 +218,7 @@ export function GroupDashboardPage() {
       <Screen width="wide" title="Kelompok" actions={<RoleSwitcher />}>
         <EmptyState
           title="Program belum dimulai"
-          description="Dasbor terisi setelah lapbul Oktober dibuka 1 November 2026."
+          description="Dasbor terisi setelah lapbul September dibuka 1 Oktober 2026."
         />
       </Screen>
     );
