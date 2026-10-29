@@ -141,7 +141,7 @@ export function MenteeHomePage() {
         {!month ? (
           <EmptyState
             title="Program belum dimulai"
-            description="Catatan Perjalanan pertama (November 2026) dibuka 1 Desember 2026."
+            description="Catatan Perjalanan pertama (Oktober 2026) dibuka 1 November 2026."
           />
         ) : (
           <Loadable query={detail}>
