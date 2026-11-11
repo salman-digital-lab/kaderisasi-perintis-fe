@@ -1,7 +1,6 @@
 import {
   ActionIcon,
   Alert,
-  Autocomplete,
   Button,
   Group,
   Paper,
@@ -321,31 +320,57 @@ const toInput = (f: FormState): KaderisasiProfileInput => ({
     .filter((w) => w.job_title || w.company || w.start_year || w.end_year),
 });
 
-/** Searchable university names; free text is allowed, as on the member site. */
+/**
+ * A campus is picked from the universities list (a name the profile already
+ * holds stays selectable); a school for an SMA/SMK entry is typed freely.
+ */
 function InstitutionInput({
   value,
   onChange,
   error,
+  school,
 }: {
   value: string;
   onChange: (v: string) => void;
   error?: string;
+  school: boolean;
 }) {
-  const [search] = useDebouncedValue(value.trim(), 300);
+  const [typed, setTyped] = useState(value);
+  const [search] = useDebouncedValue(typed.trim(), 300);
   const options = useQuery({
     queryKey: ["catalog", "universities", search],
     queryFn: () => catalogApi.universities(search),
-    enabled: search.length >= 2,
+    enabled: !school,
     staleTime: 60_000,
   });
+  if (school)
+    return (
+      <TextInput
+        label="Nama sekolah"
+        required
+        error={error}
+        value={value}
+        onChange={(ev) => onChange(ev.currentTarget.value)}
+      />
+    );
   return (
-    <Autocomplete
+    <Select
       label="Kampus / institusi"
+      placeholder="Cari dan pilih kampus"
       required
+      searchable
       error={error}
-      value={value}
-      onChange={onChange}
-      data={[...new Set((options.data ?? []).map((u) => u.name))]}
+      value={value || null}
+      onChange={(v) => onChange(v ?? "")}
+      searchValue={typed}
+      onSearchChange={setTyped}
+      data={[
+        ...new Set([
+          ...(value ? [value] : []),
+          ...(options.data ?? []).map((u) => u.name),
+        ]),
+      ]}
+      nothingFoundMessage="Kampus tidak ditemukan. Pilih dari daftar yang tersedia."
     />
   );
 }
@@ -576,12 +601,21 @@ function EditForm({
                     )}
                     value={e.degree ?? null}
                     onChange={(v) =>
-                      setEducation(i, { degree: (v as Degree) ?? undefined })
+                      setEducation(i, {
+                        degree: (v as Degree) ?? undefined,
+                        // A school name is not a campus from the list, and
+                        // the other way round.
+                        ...((e.degree === "high_school") !==
+                        (v === "high_school")
+                          ? { institution: "" }
+                          : {}),
+                      })
                     }
                   />
                   <InstitutionInput
                     value={e.institution}
                     onChange={(v) => setEducation(i, { institution: v })}
+                    school={e.degree === "high_school"}
                     error={
                       missingInstitution(e)
                         ? "Kampus / institusi wajib diisi."
