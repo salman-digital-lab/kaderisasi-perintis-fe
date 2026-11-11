@@ -325,9 +325,11 @@ const toInput = (f: FormState): KaderisasiProfileInput => ({
 function InstitutionInput({
   value,
   onChange,
+  error,
 }: {
   value: string;
   onChange: (v: string) => void;
+  error?: string;
 }) {
   const [search] = useDebouncedValue(value.trim(), 300);
   const options = useQuery({
@@ -339,6 +341,8 @@ function InstitutionInput({
   return (
     <Autocomplete
       label="Kampus / institusi"
+      required
+      error={error}
       value={value}
       onChange={onChange}
       data={[...new Set((options.data ?? []).map((u) => u.name))]}
@@ -427,6 +431,11 @@ function EditForm({
     set({ work: form.work.map((w, j) => (j === i ? { ...w, ...patch } : w)) });
   const badYear = (v: string) =>
     v.trim() && !year(v) ? "Tulis 4 angka, mis. 2024." : undefined;
+  // A row left entirely empty is dropped on save; one with any detail needs
+  // its institution.
+  const missingInstitution = (e: FormState["education"][0]) =>
+    !e.institution.trim() &&
+    Boolean(e.faculty.trim() || e.major.trim() || e.intake_year.trim());
 
   return (
     <Screen
@@ -441,7 +450,9 @@ function EditForm({
           </Button>
           <Button
             loading={save.isPending}
-            disabled={!form.name.trim()}
+            disabled={
+              !form.name.trim() || form.education.some(missingInstitution)
+            }
             onClick={() => save.mutate()}
           >
             Simpan
@@ -571,6 +582,11 @@ function EditForm({
                   <InstitutionInput
                     value={e.institution}
                     onChange={(v) => setEducation(i, { institution: v })}
+                    error={
+                      missingInstitution(e)
+                        ? "Kampus / institusi wajib diisi."
+                        : undefined
+                    }
                   />
                   <TextInput
                     label="Fakultas"
